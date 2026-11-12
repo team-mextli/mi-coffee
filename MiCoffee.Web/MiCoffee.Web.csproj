@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>38b53841-e0a1-41e5-abb9-142c2f7e0dfa</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MiCoffee.Entities\MiCoffee.Entities.csproj" />
+    <ProjectReference Include="..\MiCoffee.Business\MiCoffee.Business.csproj" />
+  </ItemGroup>
+
+</Project>
