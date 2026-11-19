@@ -8,7 +8,7 @@ Una fase termina cuando las tres ramas se integran en `main` y la funcionalidad 
 
 Sección del contexto: Alcance funcional (completo)
 
-- **Mike (Backend):** plantilla en `main` y ramas de trabajo creadas.
+- **Mike (Backend):** plantilla en `main`.
 - **Mextli (Frontend):** layout base de la interfaz del cliente y de la interfaz del personal.
 - **Emir (DBA y Pruebas):** modelo de datos completo y `schema.sql` con todas las tablas.
 
