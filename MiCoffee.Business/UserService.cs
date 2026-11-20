@@ -1,25 +1,50 @@
-﻿using MiCoffee.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+using MiCoffee.Data;
+using MiCoffee.Entities;
 
 namespace MiCoffee.Business;
 
 /// <summary>
-/// Staff login and user management. Contract only.
+/// Staff login and user management.
 /// </summary>
 public class UserService
 {
+    private readonly UserRepository _repository = new();
+    private readonly PasswordHasher<User> _hasher = new();
+
     /// <summary>
     /// Returns the user when the credentials are valid. Returns null when the
     /// username does not exist, the user is inactive or the password does not
     /// match; the cause is not distinguished.
     /// </summary>
     public User? Authenticate(string username, string password)
-        => throw new NotImplementedException();
+    {
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(password))
+        {
+            return null;
+        }
+
+        User? user = _repository.GetByUsername(username.Trim());
+        if (user is null || !user.IsActive)
+        {
+            return null;
+        }
+
+        PasswordVerificationResult result =
+            _hasher.VerifyHashedPassword(user, user.PasswordHash, password);
+
+        return result == PasswordVerificationResult.Failed ? null : user;
+    }
 
     public List<User> GetAll()
-        => throw new NotImplementedException();
+    {
+        return _repository.GetAll();
+    }
 
     public User? GetById(int userId)
-        => throw new NotImplementedException();
+    {
+        return _repository.GetById(userId);
+    }
 
     /// <summary>
     /// Creates a staff user and returns its UserId. The password is hashed
@@ -29,7 +54,19 @@ public class UserService
     /// Missing required fields or password, or username already in use.
     /// </exception>
     public int Create(User user, string password)
-        => throw new NotImplementedException();
+    {
+        NormalizeAndValidate(user);
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            throw new BusinessException("La contraseña es obligatoria.");
+        }
+
+        EnsureUsernameAvailable(user);
+
+        user.PasswordHash = _hasher.HashPassword(user, password);
+        return _repository.Insert(user);
+    }
 
     /// <summary>
     /// Updates FullName, Username and Role (IsActive is changed only through
@@ -40,7 +77,36 @@ public class UserService
     /// Admin would lose the Admin role.
     /// </exception>
     public void Update(User user, string? newPassword)
-        => throw new NotImplementedException();
+    {
+        NormalizeAndValidate(user);
+
+        User existing = _repository.GetById(user.UserId)
+            ?? throw new BusinessException("El usuario no existe.");
+
+        EnsureUsernameAvailable(user);
+
+        if (existing.Role == UserRole.Admin
+            && existing.IsActive
+            && user.Role != UserRole.Admin
+            && _repository.CountActiveAdmins() <= 1)
+        {
+            throw new BusinessException(
+                "No se puede quitar el rol de administrador al último administrador activo.");
+        }
+
+        // Start from the stored user so PasswordHash is never overwritten
+        // with the empty value that comes from a form.
+        existing.FullName = user.FullName;
+        existing.Username = user.Username;
+        existing.Role = user.Role;
+
+        if (!string.IsNullOrWhiteSpace(newPassword))
+        {
+            existing.PasswordHash = _hasher.HashPassword(existing, newPassword);
+        }
+
+        _repository.Update(existing);
+    }
 
     /// <summary>
     /// Activates or deactivates a user. Users are never deleted.
@@ -49,5 +115,60 @@ public class UserService
     /// The last active Admin cannot be deactivated.
     /// </exception>
     public void SetActive(int userId, bool isActive)
-        => throw new NotImplementedException();
+    {
+        User user = _repository.GetById(userId)
+            ?? throw new BusinessException("El usuario no existe.");
+
+        if (!isActive
+            && user.IsActive
+            && user.Role == UserRole.Admin
+            && _repository.CountActiveAdmins() <= 1)
+        {
+            throw new BusinessException(
+                "No se puede desactivar al último administrador activo.");
+        }
+
+        _repository.UpdateActive(userId, isActive);
+    }
+
+    private static void NormalizeAndValidate(User user)
+    {
+        // Model binding turns empty form fields into null.
+        user.FullName = (user.FullName ?? string.Empty).Trim();
+        user.Username = (user.Username ?? string.Empty).Trim();
+
+        if (user.FullName.Length == 0)
+        {
+            throw new BusinessException("El nombre completo es obligatorio.");
+        }
+
+        if (user.FullName.Length > 100)
+        {
+            throw new BusinessException("El nombre completo admite hasta 100 caracteres.");
+        }
+
+        if (user.Username.Length == 0)
+        {
+            throw new BusinessException("El nombre de usuario es obligatorio.");
+        }
+
+        if (user.Username.Length > 50)
+        {
+            throw new BusinessException("El nombre de usuario admite hasta 50 caracteres.");
+        }
+
+        if (!Enum.IsDefined(user.Role))
+        {
+            throw new BusinessException("El rol no es válido.");
+        }
+    }
+
+    private void EnsureUsernameAvailable(User user)
+    {
+        User? existing = _repository.GetByUsername(user.Username);
+        if (existing is not null && existing.UserId != user.UserId)
+        {
+            throw new BusinessException("El nombre de usuario ya está en uso.");
+        }
+    }
 }
