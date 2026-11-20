@@ -343,6 +343,9 @@ WHERE supply_id = 6
 -- UNIQUE: the same option cannot be allowed twice for a product (error 1062)
 -- INSERT INTO product_allowed_option (product_id, product_option_id) VALUES (3, 1);
 
+-- UNIQUE: the same option cannot be chosen twice for one order line (error 1062)
+-- INSERT INTO order_item_option (order_item_id, product_option_id, extra_price) VALUES (1, 3, 15.00);
+
 -- FOREIGN KEY: a category with products cannot be deleted (error 1451)
 -- DELETE FROM product_category WHERE product_category_id = 1;
 
