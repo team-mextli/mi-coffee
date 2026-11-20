@@ -120,6 +120,7 @@ CREATE TABLE order_item_option (
     order_item_id         INT NOT NULL,
     product_option_id     INT NOT NULL,
     extra_price           DECIMAL(10,2) NOT NULL,
+    CONSTRAINT uq_order_item_option UNIQUE (order_item_id, product_option_id),
     CONSTRAINT fk_order_item_option_order_item
         FOREIGN KEY (order_item_id)
         REFERENCES order_item (order_item_id),
