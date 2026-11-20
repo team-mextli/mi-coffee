@@ -45,6 +45,58 @@ Cada insumo tiene una existencia y un límite mínimo definidos por el administr
 
 ---
 
+## Instalación, configuración y ejecución
+
+### Requisitos previos
+
+- Git
+- SDK de .NET 10
+- MySQL Server
+- Visual Studio 2026 (opcional; también se puede ejecutar desde la línea de comandos)
+- MySQL Workbench (opcional; sirve para ejecutar los scripts de `database/`)
+
+### Instalación
+
+```
+git clone https://github.com/team-mextli/mi-coffee.git
+cd mi-coffee
+dotnet restore MiCoffee.slnx
+```
+
+Los paquetes NuGet (incluido `MySql.Data`) se restauran desde los archivos `.csproj`.
+
+### Configuración
+
+**1. Base de datos.** La base física de MySQL es local a cada computadora; el repositorio solo comparte los scripts. Desde la raíz del repositorio:
+
+```
+mysql -u <usuario> -p < database/schema.sql
+```
+
+> **Advertencia:** `schema.sql` contiene `DROP DATABASE IF EXISTS`. Al ejecutarlo se elimina y se recrea la base `mi_coffee`, con todos sus datos.
+
+**2. Cadena de conexión.** Se guarda con User Secrets; nunca se escribe en un archivo del repositorio. Desde la raíz del repositorio:
+
+```
+dotnet user-secrets set "ConnectionStrings:MiCoffee" "Server=localhost;Port=3306;Database=mi_coffee;Uid=<usuario>;Pwd=<contraseña>;" --project MiCoffee.Web
+```
+
+El `UserSecretsId` ya está en `MiCoffee.Web.csproj`; el `secrets.json` es local y no se sube ni se comparte.
+
+### Ejecución
+
+**Visual Studio:** abrir `MiCoffee.slnx`, establecer `MiCoffee.Web` como proyecto de inicio y ejecutar (F5).
+
+**Línea de comandos:**
+
+```
+dotnet run --project MiCoffee.Web
+```
+
+La aplicación queda disponible en `http://localhost:5272`. La interfaz del cliente no requiere inicio de sesión; la del personal sí.
+
+---
+
 ## Equipo de desarrollo
 
 | Nombre                                                          | Rol / área |
