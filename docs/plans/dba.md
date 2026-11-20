@@ -8,7 +8,7 @@ Las decisiones marcadas como **pendiente** se confirman con el equipo antes de i
 
 ## Cómo se avanza en cada fase
 
-1. **Datos de prueba.** Se agregan a `02_datos` los registros de las tablas de la fase. El script se ejecuta después del esquema, sin modificaciones manuales.
+1. **Datos de prueba.** Se agregan a `seed.sql` los registros de las tablas de la fase. El script se ejecuta después del esquema, sin modificaciones manuales.
 2. **Verificación en MySQL.** El esquema y los datos se ejecutan desde cero en el MySQL local sin errores.
 3. **Pruebas en la aplicación.** Cuando el Backend y el Frontend de la fase están en `main`, se ejecutan los casos de prueba de la fase y se registran en la matriz con su resultado observado.
 4. **PR de la fase.** Título `feat(db): ...` o `test(db): ...`. Mientras el PR está abierto no se hace push a `dba`; el trabajo siguiente se guarda en commits locales y se sube después de fusionar.
@@ -18,7 +18,7 @@ Las decisiones marcadas como **pendiente** se confirman con el equipo antes de i
 - **Datos ficticios.** Ningún dato de prueba corresponde a personas reales.
 - **Identificadores explícitos.** Los datos de prueba insertan sus claves primarias para que las relaciones entre tablas y las pruebas no dependan del orden de inserción.
 - **Restricciones en la base.** Las reglas que el esquema puede hacer cumplir (`NOT NULL`, `UNIQUE`, `CHECK`, claves foráneas) se mantienen ahí, además de la validación que haga Business.
-- **Nombres de los scripts.** **Pendiente:** la entrega de Base de datos pide `01_esquema`, `02_datos`, `03_consultas_vistas` y `04_rutinas_pruebas` o equivalentes. **Propuesta:** `01_schema.sql`, `02_data.sql`, `03_queries_views.sql` y `04_routines_tests.sql` en `database/`, renombrando el `schema.sql` actual.
+- **Nombres de los scripts.** Acordado con el Backend: en inglés y sin números. La entrega de Base de datos acepta equivalentes de `01_esquema`, `02_datos`, `03_consultas_vistas` y `04_rutinas_pruebas`, que en `database/` son `schema.sql`, `seed.sql`, `queries_views.sql` y `routines_tests.sql`.
 
 ---
 
@@ -32,7 +32,7 @@ Sección del contexto: «Alcance funcional». Terminada: modelo de datos complet
 
 Sección del contexto: «Usuarios del sistema». Tabla: `user`.
 
-**Datos.** Administrador inicial, dos empleados activos y un empleado inactivo. El `password_hash` del administrador lo genera el Backend con `PasswordHasher<User>`; la contraseña se comparte por fuera del repositorio.
+**Datos.** Cuenta `initial_admin` (administrador inicial del sistema, con el `password_hash` generado por el Backend con `PasswordHasher<User>`), un segundo administrador, dos empleados activos y un empleado inactivo. Las contraseñas se comparten por fuera del repositorio.
 
 **Pruebas.**
 
@@ -122,11 +122,11 @@ Además de las fases, la zona del DBA cubre estos puntos del proyecto final de B
 
 | Punto | Entregable | Cuándo |
 | --- | --- | --- |
-| 15 | `01_esquema` y `02_datos` | Fase 0 y cada fase |
-| 16 y 17 | CRUD con validaciones y 10 consultas SQL en `03_consultas_vistas` | Con los datos de prueba completos |
+| 15 | `schema.sql` y `seed.sql` | Fase 0 y cada fase |
+| 16 y 17 | CRUD con validaciones y 10 consultas SQL en `queries_views.sql` | Con los datos de prueba completos |
 | 9 y 10 | Diccionario de datos e integridad | Con el esquema cerrado |
 | 1, 2, 3, 5, 6 y 8 | Análisis, requerimientos y diseño conceptual en el reporte | En paralelo |
 | 7 | DER en cinco notaciones, editables y exportados | Con el modelo cerrado |
 | 26 a 29 | Persistencia, matriz de pruebas e incidencias | Con la aplicación terminada |
 
-**Pendiente.** Los triggers del Backend (punto 19) no registran el historial de estados, porque la aplicación ya lo guarda en la Fase 4 y el punto 21 pide no duplicar la operación. Las operaciones `DELETE` que piden los puntos 16 y 23 se acuerdan con el Backend sobre registros que no rompen la integridad.
+**Acordado con el Backend.** Los triggers (punto 19) no registran el historial de estados, porque la aplicación ya lo guarda en la Fase 4 y el punto 21 pide no duplicar la operación. Las operaciones `DELETE` que piden los puntos 16 y 23 se hacen sobre registros que no rompen la integridad; el Backend las agrega a su plan.
