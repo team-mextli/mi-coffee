@@ -91,6 +91,7 @@ Sección del contexto: «Pedidos del cliente». Tablas: `customer_order`, `order
 
 - Al menos un ítem; cantidad mayor o igual a 1; producto disponible.
 - Cada opción debe estar permitida para el producto (`product_allowed_option`).
+- Una opción no se repite dentro de un mismo ítem.
 - `unit_price` y `extra_price` se leen de la base al confirmar y se copian a la orden, como indican los comentarios del esquema. El total lo calcula Business; no se recibe del cliente.
 - El número de orden es `customer_order_id`. El estado inicial es `Received`.
 - La creación no registra fila en `order_status_history`: esa tabla exige `user_id` y el cliente no inicia sesión.
@@ -108,6 +109,8 @@ Sección del contexto: «Gestión de órdenes (empleado y admin)». Tablas: `cus
 **Parte B — Data.** `ChangeStatus` actualiza el estado e inserta el historial en una sola transacción. El `UPDATE` incluye el estado previo en el `WHERE` y se verifica el número de filas afectadas, para que dos cambios simultáneos sobre la misma orden no se pisen. El historial filtra por rango de `created_at` (el filtro incluye el día completo del extremo final) y por estado.
 
 **Parte C — Business.** Transiciones válidas; `userId` obligatorio.
+
+**Triggers de la base de datos.** Solo validan: `order_status_history` lo escribe únicamente `ChangeStatus`, en la misma transacción, para que ninguna operación se ejecute dos veces. Un trigger sobre `customer_order` rechaza las transiciones no permitidas como respaldo de la validación de Business; ambos aplican la misma tabla de transiciones, por lo que el pendiente «Transiciones permitidas» se resuelve antes de escribirlo. El rechazo llega como `MySqlException` y se traduce a `BusinessException`.
 
 **Pendientes.**
 
