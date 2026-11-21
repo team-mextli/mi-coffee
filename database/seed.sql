@@ -167,7 +167,9 @@ SET co.total = (
         GROUP BY order_item_id
     ) opt ON opt.order_item_id = oi.order_item_id
     WHERE oi.customer_order_id = co.customer_order_id
-);
+)
+-- The key condition keeps the update valid in MySQL Workbench Safe Updates mode.
+WHERE co.customer_order_id > 0;
 
 -- -------------------------------------------------------------
 -- Phase 4 - Order management
