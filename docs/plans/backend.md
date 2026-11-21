@@ -44,7 +44,7 @@ Sección del contexto: «Usuarios del sistema». Tabla: `user`. Scope de commits
 - `MiCoffee.Business`: `UserService` con `Authenticate(username, password)`, `GetAll`, `GetById`, `Create(user, password)`, `Update(user, newPassword)` y `SetActive(userId, isActive)`. La contraseña viaja como parámetro aparte para que `PasswordHash` nunca se llene desde un formulario.
 - En la descripción del PR: el contrato de claims y el fragmento de `Program.cs` (ver Entregas).
 
-**Parte B — Data.** `UserRepository`: `GetByUsername`, `GetAll`, `GetById`, `Insert`, `Update` y `UpdateActive`; con la regla del último Admin, también un conteo de administradores activos. El rol se guarda y se lee como texto (`'Employee'`, `'Admin'`).
+**Parte B — Data.** `UserRepository`: `GetByUsername`, `GetAll`, `GetById`, `Insert`, `Update` y `UpdateActive`; estos dos aplican la regla del último Admin dentro de una transacción que bloquea las filas de los administradores activos, y devuelven `false` si se incumple. El rol se guarda y se lee como texto (`'Employee'`, `'Admin'`).
 
 **Parte C — Business.**
 

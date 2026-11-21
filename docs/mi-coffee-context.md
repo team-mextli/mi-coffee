@@ -73,7 +73,7 @@ Referencias permitidas: Web → Business y Entities; Business → Data y Entitie
 | Empleado | Con inicio de sesión | Ver y gestionar órdenes, ver alertas, actualizar existencias, consultar proveedores                   |
 | Admin    | Con inicio de sesión | Todo lo del empleado, más: catálogo, insumos y límites, gestión de proveedores, usuarios del personal |
 
-Las contraseñas del personal se guardan con hash, nunca en texto plano.
+Las contraseñas del personal se guardan con hash, nunca en texto plano. Siempre hay al menos un administrador activo: el último no se puede desactivar ni dejar de ser administrador.
 
 ### Pedidos del cliente
 
