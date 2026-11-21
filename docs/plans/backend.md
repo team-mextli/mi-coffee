@@ -22,6 +22,7 @@ Cada fase se divide en las mismas partes, en este orden:
 - **Errores de validación hacia Web.** Un único mecanismo para todos los servicios, definido en la Fase 1. **Pendiente:** revisar qué patrón usa el código base de Veterinaria y seguirlo; si no define ninguno, una excepción de negocio propia con mensaje en español para la interfaz.
 - **Roles.** La restricción por rol se aplica en Web (políticas y `[Authorize]`). Los servicios de Business no verifican rol; reciben el `userId` solo cuando la regla lo requiere (trazabilidad).
 - **Transacciones.** Toda operación que escribe en más de una tabla usa una sola transacción.
+- **Eliminación.** Las reglas de qué se puede eliminar están en «Eliminación de registros» del contexto. El `DELETE` se ejecuta directamente y la clave foránea es la guarda: el `MySqlException` por violación de clave foránea se traduce a `BusinessException` con un mensaje en español. Cada registro eliminable tiene una sola clave foránea que puede bloquearlo, por lo que la causa del rechazo es conocida.
 
 ---
 
@@ -68,13 +69,13 @@ Sección del contexto: «Usuarios del sistema». Tabla: `user`. Scope de commits
 
 Sección del contexto: «Catálogo (admin)». Tablas: `product_category`, `product`, `product_option`, `product_allowed_option`. Scope: `catalog`.
 
-**Parte A — Contrato.** Entidades `ProductCategory`, `Product` y `ProductOption`; servicios `ProductCategoryService`, `ProductService` y `ProductOptionService`. La asignación de opciones a un producto (tabla `product_allowed_option`) se maneja con métodos de `ProductService` y `ProductRepository`, sin entidad propia (**propuesta**). Se incluye una consulta para la Fase 3: categorías, productos disponibles y opciones permitidas por producto.
+**Parte A — Contrato.** Entidades `ProductCategory`, `Product` y `ProductOption`; servicios `ProductCategoryService`, `ProductService` y `ProductOptionService`, cada uno con `Delete`. La asignación de opciones a un producto (tabla `product_allowed_option`) se maneja con métodos de `ProductService` y `ProductRepository`, sin entidad propia (**propuesta**). Se incluye una consulta para la Fase 3: categorías, productos disponibles y opciones permitidas por producto.
 
-**Parte B — Data.** Un repositorio por entidad; el de productos incluye leer y reemplazar las opciones permitidas de un producto.
+**Parte B — Data.** Un repositorio por entidad; el de productos incluye leer y reemplazar las opciones permitidas de un producto. Eliminar un producto o una opción borra primero sus filas de `product_allowed_option` y después el registro, en una sola transacción.
 
-**Parte C — Business.** `base_price` y `extra_price` mayores o iguales a 0; nombre de categoría único; categoría existente al crear un producto; campos requeridos con las longitudes del esquema.
+**Parte C — Business.** `base_price` y `extra_price` mayores o iguales a 0; nombre de categoría único; categoría existente al crear o editar un producto; campos requeridos con las longitudes del esquema.
 
-**Pendiente.** Eliminación de categorías, productos y opciones: el contexto no la menciona y los productos están referenciados por `order_item`. **Propuesta:** sin eliminación; los productos se retiran con `is_available`.
+**Verificación.** Además de los pasos generales, se prueban las eliminaciones permitidas y cada rechazo por clave foránea.
 
 ---
 
@@ -119,7 +120,7 @@ Sección del contexto: «Gestión de órdenes (empleado y admin)». Tablas: `cus
 
 Sección del contexto: «Proveedores». Tabla: `supplier`. Scope: `suppliers`.
 
-**Parte A — Contrato.** Entidad `Supplier` y `SupplierService` con `GetAll`, `GetById`, `Create` y `Update`. Sin eliminación: el contexto pide alta, edición y consulta, y `supply.supplier_id` referencia la tabla.
+**Parte A — Contrato.** Entidad `Supplier` y `SupplierService` con `GetAll`, `GetById`, `Create`, `Update` y `Delete`.
 
 **Parte B y C.** `SupplierRepository`; `name` y `contact` requeridos (100), `note` opcional (255).
 
@@ -129,7 +130,7 @@ Sección del contexto: «Proveedores». Tabla: `supplier`. Scope: `suppliers`.
 
 Sección del contexto: «Inventario y alertas». Tablas: `supply_category`, `supply`, con `supplier` para la alerta. Scope: `inventory`.
 
-**Parte A — Contrato.** Entidades `SupplyCategory` y `Supply` (`SupplierId` nullable; `Supplier` cargado en las alertas); `SupplyCategoryService` y `SupplyService` con alta y edición (categoría, unidad, límite mínimo, proveedor), `AddStock` (entrada de mercancía), `SetStock` (ajuste) y `GetAlerts`, que devuelve los `Supply` en alerta.
+**Parte A — Contrato.** Entidades `SupplyCategory` y `Supply` (`SupplierId` nullable; `Supplier` cargado en las alertas); `SupplyCategoryService` y `SupplyService` con alta y edición (categoría, unidad, límite mínimo, proveedor), `Delete`, `AddStock` (entrada de mercancía), `SetStock` (ajuste) y `GetAlerts`, que devuelve los `Supply` en alerta.
 
 **Parte B — Data.** `GetAlerts` calcula la alerta en la consulta: `current_stock <= minimum_stock`, con unión izquierda a proveedor (`supplier_id` admite nulo). El esquema indica que las alertas no se guardan.
 
