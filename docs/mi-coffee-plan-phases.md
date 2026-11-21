@@ -48,7 +48,7 @@ Sección del contexto: Gestión de órdenes (empleado y admin)
 
 Sección del contexto: Proveedores
 
-- **Mike (Backend):** alta, edición y consulta de proveedores.
+- **Mike (Backend):** alta, edición, eliminación y consulta de proveedores.
 - **Mextli (Frontend):** pantallas de proveedores.
 - **Emir (DBA y Pruebas):** datos de prueba y pruebas de proveedores.
 

@@ -67,11 +67,11 @@ Referencias permitidas: Web → Business y Entities; Business → Data y Entitie
 
 ### Usuarios del sistema
 
-| Usuario  | Acceso               | Puede                                                                                                        |
-| -------- | -------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Cliente  | Sin inicio de sesión | Hacer pedidos                                                                                                |
-| Empleado | Con inicio de sesión | Ver y gestionar órdenes, ver alertas, actualizar existencias, consultar proveedores                          |
-| Admin    | Con inicio de sesión | Todo lo del empleado, más: catálogo, insumos y límites, alta y edición de proveedores, usuarios del personal |
+| Usuario  | Acceso               | Puede                                                                                                 |
+| -------- | -------------------- | ----------------------------------------------------------------------------------------------------- |
+| Cliente  | Sin inicio de sesión | Hacer pedidos                                                                                         |
+| Empleado | Con inicio de sesión | Ver y gestionar órdenes, ver alertas, actualizar existencias, consultar proveedores                   |
+| Admin    | Con inicio de sesión | Todo lo del empleado, más: catálogo, insumos y límites, gestión de proveedores, usuarios del personal |
 
 Las contraseñas del personal se guardan con hash, nunca en texto plano.
 
@@ -103,6 +103,21 @@ Las contraseñas del personal se guardan con hash, nunca en texto plano.
 ### Proveedores
 
 - Lista centralizada con nombre, contacto y nota de cada proveedor, para consultar a quién llamar cuando hay que comprar mercancía.
+
+### Eliminación de registros
+
+Solo el admin elimina registros. Un registro se elimina únicamente si ningún otro depende de él; si está en uso, el sistema rechaza la eliminación y muestra un mensaje. Lo que deja de usarse pero ya forma parte de órdenes se retira en lugar de eliminarse.
+
+| Registro              | Se elimina si                                                          | Si está en uso                                |
+| --------------------- | ---------------------------------------------------------------------- | --------------------------------------------- |
+| Categoría de producto | No tiene productos                                                     | Mover o eliminar sus productos                |
+| Producto              | No aparece en ninguna orden; sus opciones asignadas se eliminan con él | Marcarlo como no disponible                   |
+| Opción                | No aparece en ninguna orden; sus asignaciones se eliminan con ella     | Quitarla de sus productos                     |
+| Proveedor             | Ningún insumo lo tiene asignado                                        | Cambiar o quitar el proveedor de esos insumos |
+| Categoría de insumo   | No tiene insumos                                                       | Mover o eliminar sus insumos                  |
+| Insumo                | Siempre: ningún otro registro depende de él                            | —                                             |
+
+Los usuarios del personal se desactivan y las órdenes, con su historial, no se eliminan.
 
 ### Fuera de alcance
 

@@ -92,7 +92,7 @@ Opcional pero recomendado. Corresponde al módulo funcional que toca el cambio o
 | `auth`      | Inicio de sesión, contraseñas con hash, acceso por rol y usuarios del personal                      |
 | `catalog`   | Categorías de producto, productos y opciones de personalización                                     |
 | `orders`    | Pedido del cliente (carrito y confirmación) y gestión de órdenes (estados, trazabilidad, historial) |
-| `suppliers` | Alta, edición y consulta de proveedores                                                             |
+| `suppliers` | Alta, edición, eliminación y consulta de proveedores                                                |
 | `inventory` | Insumos, categorías, límites, existencias y alertas                                                 |
 | `db`        | Scripts de `database/`: esquema, datos de prueba y pruebas SQL                                      |
 | `ui`        | Layout, navegación y estilos compartidos de las dos interfaces                                      |
