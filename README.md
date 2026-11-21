@@ -83,6 +83,8 @@ dotnet user-secrets set "ConnectionStrings:MiCoffee" "Server=localhost;Port=3306
 
 El `UserSecretsId` ya está en `MiCoffee.Web.csproj`; el `secrets.json` es local y no se sube ni se comparte.
 
+**3. Primer administrador.** El esquema no crea usuarios: sin datos cargados nadie puede iniciar sesión. El administrador inicial se carga con el script de datos de `database/`; tras el primer inicio de sesión se cambia su contraseña editando el usuario, y desde ahí el administrador crea al resto del personal desde el sistema. Si se pierde la contraseña de la única cuenta de administrador, solo se recupera actualizando su hash directamente en la base; conviene mantener al menos dos.
+
 ### Ejecución
 
 **Visual Studio:** abrir `MiCoffee.slnx`, establecer `MiCoffee.Web` como proyecto de inicio y ejecutar (F5).
