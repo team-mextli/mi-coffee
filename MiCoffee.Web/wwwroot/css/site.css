@@ -1,1 +1,126 @@
 /* MiCoffee styles. */
+:root {
+	--mc-blue: #88b8ce;
+	--mc-cream: #fefaf0;
+	--mc-brown: #542916;
+	--mc-amber: #f1c166;
+}
+
+.customer-body {
+	background-color: var(--mc-cream);
+	color: var(--mc-brown);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.customer-header {
+	background-color: var(--mc-blue);
+	padding: 6px;
+}
+
+.customer-header-box {
+	border: 2px dashed #2b2b2b;
+	border-radius: 14px;
+	padding: 6px 12px;
+}
+
+.customer-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.75rem;
+	text-decoration: none;
+	color: var(--mc-brown);
+}
+
+.customer-brand-name {
+	font-family: "Chelsea Market", Georgia, serif;
+	font-size: 2rem;
+	line-height: 1;
+	color: var(--mc-brown);
+}
+
+.customer-main {
+	flex: 1;
+	display: flex;
+	padding: 8px 6px 6px;
+}
+
+.customer-content {
+	flex: 1;
+	background-color: var(--mc-cream);
+	border: 2px dashed #6f9bb0;
+	border-radius: 14px;
+	padding: 1.25rem;
+}
+
+.customer-body .btn {
+	min-height: 48px;
+	font-size: 1.1rem;
+}
+
+.staff-body {
+	background-color: var(--mc-cream);
+	color: var(--mc-brown);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.staff-header {
+	background-color: var(--mc-amber);
+	padding: 6px;
+}
+
+.staff-header-box {
+	border: 2px dashed #a8813f;
+	border-radius: 14px;
+	padding: 6px 12px;
+}
+
+.staff-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.75rem;
+	text-decoration: none;
+}
+
+.staff-logo {
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	object-fit: cover;
+	background-color: var(--mc-brown);
+}
+
+.staff-brand-name {
+	font-family: "Chelsea Market", Georgia, serif;
+	font-size: 2rem;
+	line-height: 1;
+	color: var(--mc-brown);
+}
+
+.staff-main {
+	flex: 1;
+	display: flex;
+	padding: 8px 6px 6px;
+}
+
+.staff-content {
+	flex: 1;
+	background-color: var(--mc-cream);
+	border: 2px dashed #d3cfc0;
+	border-radius: 14px;
+	padding: 1.25rem;
+}
+
+.customer-logo,
+.staff-logo {
+	width: 56px;
+	height: 56px;
+	padding: 9px;
+	box-sizing: border-box;
+	object-fit: contain;
+	background-color: var(--mc-brown);
+	border-radius: 50%;
+}
