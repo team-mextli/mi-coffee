@@ -56,7 +56,7 @@ Sección del contexto: «Usuarios del sistema». Tabla: `user`. Scope de commits
 **Entregas a los demás** (después de la Parte C).
 
 - A Emir: el hash del administrador inicial, generado con el código real de Business. La contraseña en texto plano se comparte por fuera del repositorio. Se comprueba con un hash real que cabe en `VARCHAR(255)`.
-- A Mextli: fragmento de `Program.cs` (esquema de cookies, `UseAuthentication()` antes de `UseAuthorization()`, políticas «personal» —Employee o Admin— y «solo Admin», aplicadas por carpeta) y contrato de claims: `NameIdentifier` = `UserId` (lo requiere la Fase 4), `Name` = `Username`, `Role` = `Employee` o `Admin`. `Program.cs` es del proyecto Web, por lo que lo aplica el dueño de esa zona.
+- A Mextli: fragmento de `Program.cs` (esquema de cookies con la expiración fija definida en «Usuarios del sistema» del contexto y sin `SlidingExpiration`, `UseAuthentication()` antes de `UseAuthorization()`, políticas «personal» —Employee o Admin— y «solo Admin», aplicadas por carpeta) y contrato de claims: `NameIdentifier` = `UserId` (lo requiere la Fase 4), `Name` = `Username`, `Role` = `Employee` o `Admin`. La cookie no es persistente. `Program.cs` es del proyecto Web, por lo que lo aplica el dueño de esa zona.
 
 **Pendientes de la fase.**
 

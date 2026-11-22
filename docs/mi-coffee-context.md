@@ -75,6 +75,8 @@ Referencias permitidas: Web → Business y Entities; Business → Data y Entitie
 
 Las contraseñas del personal se guardan con hash, nunca en texto plano. Siempre hay al menos un administrador activo: el último no se puede desactivar ni dejar de ser administrador.
 
+La sesión del personal expira a las 8 horas del inicio de sesión y se cierra al cerrar el navegador; el personal también puede cerrarla. Desactivar a un usuario o cambiarle el rol surte efecto en su siguiente inicio de sesión: una sesión abierta conserva su acceso hasta que expire.
+
 ### Pedidos del cliente
 
 - Navegar el catálogo por categorías y elegir un producto. Los productos marcados como no disponibles no se pueden pedir.
