@@ -85,15 +85,6 @@ public class UserService
 
         EnsureUsernameAvailable(user);
 
-        if (existing.Role == UserRole.Admin
-            && existing.IsActive
-            && user.Role != UserRole.Admin
-            && _repository.CountActiveAdmins() <= 1)
-        {
-            throw new BusinessException(
-                "No se puede quitar el rol de administrador al último administrador activo.");
-        }
-
         // Start from the stored user so PasswordHash is never overwritten
         // with the empty value that comes from a form.
         existing.FullName = user.FullName;
@@ -105,7 +96,11 @@ public class UserService
             existing.PasswordHash = _hasher.HashPassword(existing, newPassword);
         }
 
-        _repository.Update(existing);
+        if (!_repository.Update(existing))
+        {
+            throw new BusinessException(
+                "No se puede quitar el rol de administrador al último administrador activo.");
+        }
     }
 
     /// <summary>
@@ -116,19 +111,16 @@ public class UserService
     /// </exception>
     public void SetActive(int userId, bool isActive)
     {
-        User user = _repository.GetById(userId)
-            ?? throw new BusinessException("El usuario no existe.");
+        if (_repository.GetById(userId) is null)
+        {
+            throw new BusinessException("El usuario no existe.");
+        }
 
-        if (!isActive
-            && user.IsActive
-            && user.Role == UserRole.Admin
-            && _repository.CountActiveAdmins() <= 1)
+        if (!_repository.UpdateActive(userId, isActive))
         {
             throw new BusinessException(
                 "No se puede desactivar al último administrador activo.");
         }
-
-        _repository.UpdateActive(userId, isActive);
     }
 
     private static void NormalizeAndValidate(User user)
