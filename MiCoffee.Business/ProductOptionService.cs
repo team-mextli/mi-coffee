@@ -1,3 +1,4 @@
+using MiCoffee.Data;
 using MiCoffee.Entities;
 
 namespace MiCoffee.Business;
@@ -8,15 +9,19 @@ namespace MiCoffee.Business;
 /// </summary>
 public class ProductOptionService
 {
+    private const decimal MaxPrice = 99999999.99m;
+
+    private readonly ProductOptionRepository _repository = new();
+
     /// <summary>Returns all options ordered by group and name.</summary>
     public List<ProductOption> GetAll()
     {
-        throw new NotImplementedException();
+        return _repository.GetAll();
     }
 
     public ProductOption? GetById(int productOptionId)
     {
-        throw new NotImplementedException();
+        return _repository.GetById(productOptionId);
     }
 
     /// <summary>
@@ -27,7 +32,9 @@ public class ProductOptionService
     /// </exception>
     public int Create(ProductOption option)
     {
-        throw new NotImplementedException();
+        NormalizeAndValidate(option);
+
+        return _repository.Insert(option);
     }
 
     /// <exception cref="BusinessException">
@@ -36,7 +43,14 @@ public class ProductOptionService
     /// </exception>
     public void Update(ProductOption option)
     {
-        throw new NotImplementedException();
+        NormalizeAndValidate(option);
+
+        if (_repository.GetById(option.ProductOptionId) is null)
+        {
+            throw new BusinessException("La opción no existe.");
+        }
+
+        _repository.Update(option);
     }
 
     /// <summary>
@@ -48,6 +62,49 @@ public class ProductOptionService
     /// </exception>
     public void Delete(int productOptionId)
     {
-        throw new NotImplementedException();
+        if (_repository.GetById(productOptionId) is null)
+        {
+            throw new BusinessException("La opción no existe.");
+        }
+
+        if (!_repository.Delete(productOptionId))
+        {
+            throw new BusinessException(
+                "No se puede eliminar la opción porque aparece en órdenes. " +
+                "Quítela de sus productos.");
+        }
+    }
+
+    private static void NormalizeAndValidate(ProductOption option)
+    {
+        // Model binding turns empty form fields into null.
+        option.OptionGroup = (option.OptionGroup ?? string.Empty).Trim();
+        option.Name = (option.Name ?? string.Empty).Trim();
+
+        if (option.OptionGroup.Length == 0)
+        {
+            throw new BusinessException("El grupo de la opción es obligatorio.");
+        }
+
+        if (option.OptionGroup.Length > 50)
+        {
+            throw new BusinessException("El grupo de la opción admite hasta 50 caracteres.");
+        }
+
+        if (option.Name.Length == 0)
+        {
+            throw new BusinessException("El nombre de la opción es obligatorio.");
+        }
+
+        if (option.Name.Length > 50)
+        {
+            throw new BusinessException("El nombre de la opción admite hasta 50 caracteres.");
+        }
+
+        if (option.ExtraPrice < 0 || option.ExtraPrice > MaxPrice)
+        {
+            throw new BusinessException(
+                "El precio adicional debe estar entre 0 y 99,999,999.99.");
+        }
     }
 }

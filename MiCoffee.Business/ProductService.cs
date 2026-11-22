@@ -1,3 +1,4 @@
+using MiCoffee.Data;
 using MiCoffee.Entities;
 
 namespace MiCoffee.Business;
@@ -7,13 +8,19 @@ namespace MiCoffee.Business;
 /// </summary>
 public class ProductService
 {
+    private const decimal MaxPrice = 99999999.99m;
+
+    private readonly ProductRepository _repository = new();
+    private readonly ProductCategoryRepository _categoryRepository = new();
+    private readonly ProductOptionRepository _optionRepository = new();
+
     /// <summary>
     /// Returns all products, available or not, ordered by category name and
     /// product name. Category is loaded; AllowedOptions is not.
     /// </summary>
     public List<Product> GetAll()
     {
-        throw new NotImplementedException();
+        return _repository.GetAll();
     }
 
     /// <summary>
@@ -21,7 +28,7 @@ public class ProductService
     /// </summary>
     public Product? GetById(int productId)
     {
-        throw new NotImplementedException();
+        return _repository.GetById(productId);
     }
 
     /// <summary>
@@ -33,7 +40,10 @@ public class ProductService
     /// </exception>
     public int Create(Product product)
     {
-        throw new NotImplementedException();
+        NormalizeAndValidate(product);
+        EnsureCategoryExists(product);
+
+        return _repository.Insert(product);
     }
 
     /// <summary>
@@ -46,7 +56,16 @@ public class ProductService
     /// </exception>
     public void Update(Product product)
     {
-        throw new NotImplementedException();
+        NormalizeAndValidate(product);
+
+        if (_repository.GetById(product.ProductId) is null)
+        {
+            throw new BusinessException("El producto no existe.");
+        }
+
+        EnsureCategoryExists(product);
+
+        _repository.Update(product);
     }
 
     /// <summary>
@@ -58,7 +77,17 @@ public class ProductService
     /// </exception>
     public void Delete(int productId)
     {
-        throw new NotImplementedException();
+        if (_repository.GetById(productId) is null)
+        {
+            throw new BusinessException("El producto no existe.");
+        }
+
+        if (!_repository.Delete(productId))
+        {
+            throw new BusinessException(
+                "No se puede eliminar el producto porque aparece en órdenes. " +
+                "Márquelo como no disponible.");
+        }
     }
 
     /// <summary>
@@ -70,7 +99,23 @@ public class ProductService
     /// </exception>
     public void SetAllowedOptions(int productId, IEnumerable<int> productOptionIds)
     {
-        throw new NotImplementedException();
+        if (_repository.GetById(productId) is null)
+        {
+            throw new BusinessException("El producto no existe.");
+        }
+
+        List<int> ids = productOptionIds.Distinct().ToList();
+
+        HashSet<int> existingIds = _optionRepository.GetAll()
+            .Select(option => option.ProductOptionId)
+            .ToHashSet();
+
+        if (ids.Any(id => !existingIds.Contains(id)))
+        {
+            throw new BusinessException("Alguna de las opciones seleccionadas no existe.");
+        }
+
+        _repository.ReplaceAllowedOptions(productId, ids);
     }
 
     /// <summary>
@@ -80,6 +125,36 @@ public class ProductService
     /// </summary>
     public List<Product> GetMenu()
     {
-        throw new NotImplementedException();
+        return _repository.GetMenu();
+    }
+
+    private static void NormalizeAndValidate(Product product)
+    {
+        // Model binding turns empty form fields into null.
+        product.Name = (product.Name ?? string.Empty).Trim();
+
+        if (product.Name.Length == 0)
+        {
+            throw new BusinessException("El nombre del producto es obligatorio.");
+        }
+
+        if (product.Name.Length > 100)
+        {
+            throw new BusinessException("El nombre del producto admite hasta 100 caracteres.");
+        }
+
+        if (product.BasePrice < 0 || product.BasePrice > MaxPrice)
+        {
+            throw new BusinessException(
+                "El precio base debe estar entre 0 y 99,999,999.99.");
+        }
+    }
+
+    private void EnsureCategoryExists(Product product)
+    {
+        if (_categoryRepository.GetById(product.ProductCategoryId) is null)
+        {
+            throw new BusinessException("La categoría seleccionada no existe.");
+        }
     }
 }
