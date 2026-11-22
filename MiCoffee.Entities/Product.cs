@@ -18,7 +18,8 @@ public class Product
 
     public bool IsAvailable { get; set; } = true;
 
-    // Loaded by ProductService reads (GetAll, GetById, GetMenu). Never bound
+    // Category is loaded by GetAll, GetById and GetMenu; AllowedOptions only by
+    // GetById and GetMenu. Never bound
     // from a form: the allowed options are changed only through
     // ProductService.SetAllowedOptions.
     public ProductCategory? Category { get; set; }
