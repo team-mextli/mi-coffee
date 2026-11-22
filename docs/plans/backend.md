@@ -96,6 +96,8 @@ Sección del contexto: «Pedidos del cliente». Tablas: `customer_order`, `order
 - El número de orden es `customer_order_id`. El estado inicial es `Received`.
 - La creación no registra fila en `order_status_history`: esa tabla exige `user_id` y el cliente no inicia sesión.
 
+**Trigger de la base de datos.** Solo valida: un trigger `BEFORE INSERT` sobre `order_item` rechaza los productos no disponibles como respaldo de la validación de Business, sin escribir datos. El rechazo llega como `MySqlException` y se traduce a `BusinessException`.
+
 **Pendiente.** Fórmula de cada línea. **Propuesta:** `(unit_price + suma de extra_price) × quantity`.
 
 ---
@@ -110,7 +112,7 @@ Sección del contexto: «Gestión de órdenes (empleado y admin)». Tablas: `cus
 
 **Parte C — Business.** Transiciones válidas; `userId` obligatorio.
 
-**Triggers de la base de datos.** Solo validan: `order_status_history` lo escribe únicamente `ChangeStatus`, en la misma transacción, para que ninguna operación se ejecute dos veces. Un trigger sobre `customer_order` rechaza las transiciones no permitidas como respaldo de la validación de Business; ambos aplican la misma tabla de transiciones, por lo que el pendiente «Transiciones permitidas» se resuelve antes de escribirlo. El rechazo llega como `MySqlException` y se traduce a `BusinessException`.
+**Triggers de la base de datos.** Solo validan: `order_status_history` lo escribe únicamente `ChangeStatus`, en la misma transacción, para que ninguna operación se ejecute dos veces. Un trigger `BEFORE UPDATE` sobre `customer_order` rechaza las transiciones no permitidas, solo cuando el estado cambia, como respaldo de la validación de Business; ambos aplican la misma tabla de transiciones, por lo que el pendiente «Transiciones permitidas» se resuelve antes de escribirlo. El rechazo llega como `MySqlException` y se traduce a `BusinessException`.
 
 **Pendientes.**
 
