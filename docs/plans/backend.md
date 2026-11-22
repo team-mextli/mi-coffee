@@ -19,7 +19,7 @@ Cada fase se divide en las mismas partes, en este orden:
 
 ### Decisiones transversales
 
-- **Errores de validación hacia Web.** Un único mecanismo para todos los servicios, definido en la Fase 1. **Pendiente:** revisar qué patrón usa el código base de Veterinaria y seguirlo; si no define ninguno, una excepción de negocio propia con mensaje en español para la interfaz.
+- **Errores de validación hacia Web.** Un único mecanismo para todos los servicios, definido en la Fase 1.
 - **Roles.** La restricción por rol se aplica en Web (políticas y `[Authorize]`). Los servicios de Business no verifican rol; reciben el `userId` solo cuando la regla lo requiere (trazabilidad).
 - **Transacciones.** Toda operación que escribe en más de una tabla usa una sola transacción.
 - **Eliminación.** Las reglas de qué se puede eliminar están en «Eliminación de registros» del contexto. El `DELETE` se ejecuta directamente y la clave foránea es la guarda: el `MySqlException` por violación de clave foránea se traduce a `BusinessException` con un mensaje en español. Cada registro eliminable tiene una sola clave foránea que puede bloquearlo, por lo que la causa del rechazo es conocida.
