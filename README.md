@@ -67,10 +67,12 @@ Los paquetes NuGet (incluido `MySql.Data`) se restauran desde los archivos `.csp
 
 ### Configuración
 
-**1. Base de datos.** La base física de MySQL es local a cada computadora; el repositorio solo comparte los scripts. Desde la raíz del repositorio:
+**1. Base de datos.** La base física de MySQL es local a cada computadora; el repositorio solo comparte los scripts. Desde la raíz del repositorio, en este orden:
 
 ```
 mysql -u <usuario> -p < database/schema.sql
+mysql -u <usuario> -p < database/routines_tests.sql
+mysql -u <usuario> -p < database/seed.sql
 ```
 
 > **Advertencia:** `schema.sql` contiene `DROP DATABASE IF EXISTS`. Al ejecutarlo se elimina y se recrea la base `mi_coffee`, con todos sus datos.
