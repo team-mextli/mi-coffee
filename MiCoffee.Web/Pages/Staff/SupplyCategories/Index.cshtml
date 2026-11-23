@@ -1,0 +1,47 @@
+@page
+@model MiCoffee.Web.Pages.Staff.SupplyCategories.IndexModel
+@{
+    ViewData["Title"] = "Categorías de insumo";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 mb-0">Categorías de insumo</h1>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" asp-page="/Staff/Supplies/Index">Inventario</a>
+        <a class="btn btn-primary" asp-page="/Staff/SupplyCategories/Create">Nueva categoría</a>
+    </div>
+</div>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+else if (!Model.Categories.Any())
+{
+    <p>Aún no hay categorías de insumo.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model.Categories)
+                {
+                    <tr>
+                        <td>@category.Name</td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-sm btn-outline-secondary" asp-page="/Staff/SupplyCategories/Edit" asp-route-id="@category.SupplyCategoryId">Editar</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-page="/Staff/SupplyCategories/Delete" asp-route-id="@category.SupplyCategoryId">Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

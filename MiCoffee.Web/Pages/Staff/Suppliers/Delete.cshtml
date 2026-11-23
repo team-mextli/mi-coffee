@@ -1,0 +1,40 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Staff.Suppliers.DeleteModel
+@{
+    ViewData["Title"] = "Eliminar proveedor";
+}
+
+<h1 class="h3 mb-3">Eliminar proveedor</h1>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.Supplier is null)
+{
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Suppliers/Index">Regresar</a>
+    return;
+}
+
+<dl class="mb-4">
+    <dt>Nombre</dt>
+    <dd>@Model.Supplier.Name</dd>
+    <dt>Contacto</dt>
+    <dd>@Model.Supplier.Contact</dd>
+    <dt>Nota</dt>
+    <dd>@(Model.Supplier.Note ?? "—")</dd>
+</dl>
+
+@if (Model.CanDelete)
+{
+    <p>¿Seguro que quieres eliminar este proveedor? No se puede deshacer.</p>
+    <form method="post" class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Eliminar proveedor</button>
+        <a class="btn btn-outline-secondary" asp-page="/Staff/Suppliers/Index">Cancelar</a>
+    </form>
+}
+else
+{
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Suppliers/Index">Regresar</a>
+}
