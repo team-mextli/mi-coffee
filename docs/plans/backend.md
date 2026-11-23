@@ -105,9 +105,9 @@ Sección del contexto: «Pedidos del cliente». Tablas: `customer_order`, `order
 
 Sección del contexto: «Gestión de órdenes (empleado y admin)». Tablas: `customer_order`, `order_status_history`. Scope: `orders`.
 
-**Parte A — Contrato.** Entidad `OrderStatusHistory` y, en `OrderService`: `GetActive`, `GetById` (recibo con ítems y opciones), `ChangeStatus(orderId, newStatus, userId)` y `Search(from, to, status)` para el historial.
+**Parte A — Contrato.** Entidad `OrderStatusHistory` (con `ChangedByName`, el nombre de quien hizo el cambio). Para el recibo, `OrderItem` y `OrderItemOption` ganan `ProductName` y `OptionName`, y `CustomerOrder` gana `StatusHistory`; `Create` ignora los tres. En `OrderService`: `GetActive` (con ítems y opciones), `GetById` (recibo con ítems, opciones e historial de estados), `ChangeStatus(orderId, newStatus, userId)` y `Search(from, to, status)` para el historial (filtros opcionales, sin ítems).
 
-**Parte B — Data.** `ChangeStatus` actualiza el estado e inserta el historial en una sola transacción. El `UPDATE` incluye el estado previo en el `WHERE` y se verifica el número de filas afectadas, para que dos cambios simultáneos sobre la misma orden no se pisen. El historial filtra por rango de `created_at` (el filtro incluye el día completo del extremo final) y por estado.
+**Parte B — Data.** `ChangeStatus` actualiza el estado e inserta el historial en una sola transacción. El `UPDATE` incluye el estado previo en el `WHERE` y se verifica el número de filas afectadas, para que dos cambios simultáneos sobre la misma orden no se pisen. `Search` filtra las órdenes (no las filas de `order_status_history`) por rango de `created_at` (el filtro incluye el día completo del extremo final) y por su estado actual, y las ordena de la más reciente a la más antigua.
 
 **Parte C — Business.** Transiciones válidas; `userId` obligatorio.
 
@@ -116,7 +116,7 @@ Sección del contexto: «Gestión de órdenes (empleado y admin)». Tablas: `cus
 **Pendientes.**
 
 - Transiciones permitidas. **Propuesta:** avance de un paso (`Received` → `InPreparation` → `Ready` → `Delivered`) y cancelación desde `Received`, `InPreparation` o `Ready`; `Delivered` y `Cancelled` son finales.
-- Qué muestra la lista del personal. **Propuesta:** las órdenes en `Received`, `InPreparation` y `Ready`; el resto se consulta en el historial. Se confirma con Mextli, que construye la pantalla.
+- Qué muestra la lista del personal. **Propuesta:** las órdenes en `Received`, `InPreparation` y `Ready`, de la más antigua a la más reciente; el resto se consulta en el historial. Se confirma con Mextli, que construye la pantalla.
 
 ---
 
