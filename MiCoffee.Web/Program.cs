@@ -9,6 +9,9 @@ builder.Services.AddRazorPages(options =>
 	options.Conventions.AuthorizeFolder("/Staff", "StaffOnly");
 	options.Conventions.AllowAnonymousToPage("/Staff/Login");
 	options.Conventions.AuthorizeFolder("/Staff/Users", "AdminOnly");
+	options.Conventions.AuthorizeFolder("/Staff/Categories", "AdminOnly");
+	options.Conventions.AuthorizeFolder("/Staff/Products", "AdminOnly");
+	options.Conventions.AuthorizeFolder("/Staff/Options", "AdminOnly");
 });
 
 builder.Services
@@ -17,8 +20,8 @@ builder.Services
 	{
 		options.LoginPath = "/Staff/Login";
 		options.AccessDeniedPath = "/Staff/Login";
-		options.ExpireTimeSpan = TimeSpan.FromHours(8);   
-		options.SlidingExpiration = false;                
+		options.ExpireTimeSpan = TimeSpan.FromHours(8);
+		options.SlidingExpiration = false;
 	});
 
 builder.Services.AddAuthorization(options =>

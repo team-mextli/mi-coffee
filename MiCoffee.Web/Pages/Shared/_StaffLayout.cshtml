@@ -26,7 +26,14 @@
                     @if (User.IsInRole("Admin"))
                     {
                         <a class="staff-link" asp-page="/Staff/Users/Index">Usuarios</a>
-                        <span class="staff-link text-muted">Catálogo </span>
+                        <div class="dropdown">
+                            <a class="staff-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Catálogo</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-page="/Staff/Categories/Index">Categorías</a></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/Products/Index">Productos</a></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/Options/Index">Opciones</a></li>
+                            </ul>
+                        </div>
                     }
 
                     <span class="staff-link text-muted">Órdenes</span>

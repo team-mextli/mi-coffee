@@ -1,0 +1,40 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Staff.Categories.DeleteModel
+@{
+    ViewData["Title"] = "Eliminar categoría";
+}
+
+<h1 class="h3 mb-3 text-center">Eliminar categoría</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="alert alert-danger mc-form">@Model.Error</div>
+}
+
+@if (Model.Category is not null)
+{
+    <div class="mc-card mc-form">
+        <p class="mb-4">Categoría: <strong>@Model.Category.Name</strong></p>
+
+        @if (Model.CanDelete)
+        {
+            <p>¿Seguro que quieres eliminarla? Esta acción no se puede deshacer.</p>
+
+            <form method="post">
+                <button type="submit" class="btn btn-primary">Eliminar</button>
+                <a asp-page="./Index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        }
+        else
+        {
+            <a asp-page="/Staff/Products/Index" class="btn btn-primary">Ir a productos</a>
+            <a asp-page="./Index" class="btn btn-secondary">Regresar</a>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <a asp-page="./Index" class="btn btn-secondary">Regresar</a>
+    </div>
+}

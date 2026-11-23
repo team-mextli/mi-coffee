@@ -1,0 +1,58 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Staff.Options.EditModel
+@{
+    ViewData["Title"] = "Editar opción";
+}
+
+<h1 class="h3 mb-3 text-center">Editar opción</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="alert alert-danger mc-form">@Model.Error</div>
+}
+
+@if (Model.Loaded)
+{
+    <div class="mc-card mc-form">
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="ProductOption.OptionGroup" class="form-label">Grupo</label>
+                <input asp-for="ProductOption.OptionGroup" class="form-control" list="option-groups" autocomplete="off" />
+                <datalist id="option-groups">
+                    @foreach (string group in Model.Groups)
+                    {
+                        <option value="@group"></option>
+                    }
+                </datalist>
+                <div class="form-text">Por ejemplo: Tamaño, Leche, Endulzante o Extra.</div>
+                <span asp-validation-for="ProductOption.OptionGroup" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ProductOption.Name" class="form-label">Nombre</label>
+                <input asp-for="ProductOption.Name" class="form-control" autocomplete="off" />
+                <span asp-validation-for="ProductOption.Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="ProductOption.ExtraPrice" class="form-label">Precio adicional</label>
+                <input asp-for="ProductOption.ExtraPrice" type="number" step="0.01" min="0" class="form-control" />
+                <div class="form-text">Lo que suma al precio base. Puede ser 0.</div>
+                <span asp-validation-for="ProductOption.ExtraPrice" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-page="./Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <a asp-page="./Index" class="btn btn-secondary">Regresar</a>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

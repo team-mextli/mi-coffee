@@ -1,0 +1,38 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Staff.Categories.EditModel
+@{
+    ViewData["Title"] = "Editar categoría";
+}
+
+<h1 class="h3 mb-3 text-center">Editar categoría</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="alert alert-danger mc-form">@Model.Error</div>
+}
+
+@if (Model.Loaded)
+{
+    <div class="mc-card mc-form">
+        <form method="post">
+            <div class="mb-4">
+                <label asp-for="Category.Name" class="form-label">Nombre</label>
+                <input asp-for="Category.Name" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Category.Name" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-page="./Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <a asp-page="./Index" class="btn btn-secondary">Regresar</a>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
