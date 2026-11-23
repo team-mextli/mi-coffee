@@ -105,17 +105,16 @@ Sección del contexto: «Pedidos del cliente». Tablas: `customer_order`, `order
 
 Sección del contexto: «Gestión de órdenes (empleado y admin)». Tablas: `customer_order`, `order_status_history`. Scope: `orders`.
 
-**Parte A — Contrato.** Entidad `OrderStatusHistory` (con `ChangedByName`, el nombre de quien hizo el cambio). Para el recibo, `OrderItem` y `OrderItemOption` ganan `ProductName` y `OptionName`, y `CustomerOrder` gana `StatusHistory`; `Create` ignora los tres. En `OrderService`: `GetActive` (con ítems y opciones), `GetById` (recibo con ítems, opciones e historial de estados), `ChangeStatus(orderId, newStatus, userId)` y `Search(from, to, status)` para el historial (filtros opcionales, sin ítems).
+**Parte A — Contrato.** Entidad `OrderStatusHistory` (con `ChangedByName`, el nombre de quien hizo el cambio). Para el recibo, `OrderItem` y `OrderItemOption` ganan `ProductName` y `OptionName`, y `CustomerOrder` gana `StatusHistory`; `Create` ignora los tres. En `OrderService`: `GetActive` (con ítems y opciones), `GetById` (recibo con ítems, opciones e historial de estados), `GetNextStatuses(current)` (los estados a los que puede pasar una orden, para que Web ofrezca solo cambios válidos sin repetir la regla), `ChangeStatus(orderId, newStatus, userId)` y `Search(fromDate, toDate, status)` para el historial (filtros opcionales, sin ítems).
 
-**Parte B — Data.** `ChangeStatus` actualiza el estado e inserta el historial en una sola transacción. El `UPDATE` incluye el estado previo en el `WHERE` y se verifica el número de filas afectadas, para que dos cambios simultáneos sobre la misma orden no se pisen. `Search` filtra las órdenes (no las filas de `order_status_history`) por rango de `created_at` (el filtro incluye el día completo del extremo final) y por su estado actual, y las ordena de la más reciente a la más antigua.
+**Parte B — Data.** `GetStatus` lee el estado actual de la orden. `ChangeStatus` actualiza el estado e inserta el historial en una sola transacción. El `UPDATE` incluye el estado previo en el `WHERE` y se verifica el número de filas afectadas, para que dos cambios simultáneos sobre la misma orden no se pisen. `Search` filtra las órdenes (no las filas de `order_status_history`) por rango de `created_at` (el filtro incluye el día completo del extremo final) y por su estado actual, y las ordena de la más reciente a la más antigua.
 
-**Parte C — Business.** Transiciones válidas; `userId` obligatorio.
+**Parte C — Business.** Transiciones válidas (la tabla vive en `GetNextStatuses`); `userId` obligatorio; en `Search`, la fecha inicial no puede ser posterior a la final.
 
-**Triggers de la base de datos.** Solo validan: `order_status_history` lo escribe únicamente `ChangeStatus`, en la misma transacción, para que ninguna operación se ejecute dos veces. Un trigger `BEFORE UPDATE` sobre `customer_order` rechaza las transiciones no permitidas, solo cuando el estado cambia, como respaldo de la validación de Business; ambos aplican la misma tabla de transiciones, por lo que el pendiente «Transiciones permitidas» se resuelve antes de escribirlo. El rechazo llega como `MySqlException` y se traduce a `BusinessException`.
+**Triggers de la base de datos.** Solo validan: `order_status_history` lo escribe únicamente `ChangeStatus`, en la misma transacción, para que ninguna operación se ejecute dos veces. Un trigger `BEFORE UPDATE` sobre `customer_order` rechaza las transiciones no permitidas, solo cuando el estado cambia, como respaldo de la validación de Business; ambos aplican la misma tabla de transiciones, la del contexto. El rechazo llega como `MySqlException` y se traduce a `BusinessException`.
 
 **Pendientes.**
 
-- Transiciones permitidas. **Propuesta:** avance de un paso (`Received` → `InPreparation` → `Ready` → `Delivered`) y cancelación desde `Received`, `InPreparation` o `Ready`; `Delivered` y `Cancelled` son finales.
 - Qué muestra la lista del personal. **Propuesta:** las órdenes en `Received`, `InPreparation` y `Ready`, de la más antigua a la más reciente; el resto se consulta en el historial. Se confirma con Mextli, que construye la pantalla.
 
 ---
