@@ -1,0 +1,91 @@
+@page
+@model MiCoffee.Web.Pages.Order.CartModel
+@{
+    Layout = "_CustomerLayout";
+    ViewData["Title"] = "Carrito";
+}
+
+<h1 class="h3 mb-3">Tu carrito</h1>
+
+@if (TempData["Message"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (!Model.Lines.Any())
+{
+    <p>Tu carrito está vacío.</p>
+    <a class="btn btn-primary" asp-page="/Index">Ver el menú</a>
+    return;
+}
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-end">Importe</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model.Lines)
+            {
+                <tr>
+                    <td>
+                        <strong>@line.ProductName</strong>
+                        @if (line.OptionNames.Any())
+                        {
+                            <div class="small text-muted">@string.Join(", ", line.OptionNames)</div>
+                        }
+                        @if (!string.IsNullOrEmpty(line.Item.Note))
+                        {
+                            <div class="small fst-italic">@line.Item.Note</div>
+                        }
+                    </td>
+                    <td class="text-center">@line.Item.Quantity</td>
+                    <td class="text-end">@(line.LineTotal is null ? "—" : "$" + line.LineTotal.Value.ToString("N2"))</td>
+                    <td class="text-end">
+                        <form method="post" asp-page-handler="Remove">
+                            <input type="hidden" name="index" value="@line.Index" />
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Quitar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        @if (Model.Total is not null)
+        {
+            <tfoot>
+                <tr>
+                    <th colspan="2" class="text-end">Total</th>
+                    <th class="text-end">$@Model.Total.Value.ToString("N2")</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        }
+    </table>
+</div>
+
+<form method="post" asp-page-handler="Confirm">
+    <div class="mb-3">
+        <label class="form-label" asp-for="CustomerName">Nombre (opcional)</label>
+        <input class="form-control" asp-for="CustomerName" maxlength="50" />
+        <span class="text-danger" asp-validation-for="CustomerName"></span>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+        <button type="submit" class="btn btn-primary" disabled="@(!Model.CanConfirm)">Confirmar pedido</button>
+        <a class="btn btn-outline-secondary" asp-page="/Index">Seguir pidiendo</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

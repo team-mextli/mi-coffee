@@ -1,0 +1,133 @@
+@page "{id:int}"
+@using MiCoffee.Web.Helpers
+@model MiCoffee.Web.Pages.Staff.Orders.DetailsModel
+@{
+    ViewData["Title"] = "Orden";
+}
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.Order is null)
+{
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Orders/Index">Regresar</a>
+    return;
+}
+
+@{
+    var order = Model.Order;
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 mb-0">Orden #@order.CustomerOrderId</h1>
+    <span class="badge fs-6 @OrderStatusLabels.BadgeClass(order.Status)">@OrderStatusLabels.Text(order.Status)</span>
+</div>
+
+<p class="mb-1"><strong>Fecha y hora:</strong> @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+<p class="mb-3"><strong>Cliente:</strong> @(order.CustomerName ?? "Sin nombre")</p>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-end">Precio unitario</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in order.Items)
+            {
+                <tr>
+                    <td>
+                        <strong>@item.ProductName</strong>
+                        @foreach (var option in item.Options)
+                        {
+                            <div class="small text-muted">
+                                @option.OptionName
+                                @if (option.ExtraPrice > 0)
+                                {
+                                    <span>(+$@option.ExtraPrice.ToString("N2"))</span>
+                                }
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(item.Note))
+                        {
+                            <div class="small fst-italic">Nota: @item.Note</div>
+                        }
+                    </td>
+                    <td class="text-center">@item.Quantity</td>
+                    <td class="text-end">$@item.UnitPrice.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2" class="text-end">Total</th>
+                <th class="text-end">$@order.Total.ToString("N2")</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<h2 class="h5">Cambiar estado</h2>
+@if (!Model.NextStatuses.Any())
+{
+    <p>Esta orden ya no admite cambios.</p>
+}
+else
+{
+    <div class="d-flex gap-2 flex-wrap mb-4">
+        @foreach (var next in Model.NextStatuses)
+        {
+            <form method="post" asp-page-handler="ChangeStatus" asp-route-id="@order.CustomerOrderId">
+                <input type="hidden" name="newStatus" value="@next" />
+                @if (next == MiCoffee.Entities.OrderStatus.Cancelled)
+                {
+                    <button type="submit" class="btn btn-outline-danger"
+                            onclick="return confirm('¿Cancelar esta orden? Ya no se podrá cambiar.');">@OrderStatusLabels.ActionText(next)</button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">@OrderStatusLabels.ActionText(next)</button>
+                }
+            </form>
+        }
+    </div>
+}
+
+<h2 class="h5">Trazabilidad</h2>
+@if (!order.StatusHistory.Any())
+{
+    <p>Esta orden aún no tiene cambios de estado.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Fecha y hora</th>
+                    <th>Usuario</th>
+                    <th>Estado anterior</th>
+                    <th>Estado nuevo</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var change in order.StatusHistory)
+                {
+                    <tr>
+                        <td>@change.ChangedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@change.ChangedByName</td>
+                        <td>@OrderStatusLabels.Text(change.PreviousStatus)</td>
+                        <td>@OrderStatusLabels.Text(change.NewStatus)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a class="btn btn-outline-secondary" asp-page="/Staff/Orders/Index">Regresar</a>

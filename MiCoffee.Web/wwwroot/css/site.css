@@ -330,3 +330,61 @@
 		background-color: var(--mc-amber);
 		color: var(--mc-brown);
 	}
+
+/* Phase 3 - customer ordering. Append to wwwroot/css/site.css (additions only). */
+.customer-body .btn {
+	min-height: 48px;
+	min-width: 48px;
+	padding: 0.5rem 1.25rem;
+}
+
+.customer-body .btn-sm {
+	min-height: 48px;
+}
+
+.customer-body .product-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-height: 96px;
+	padding: 1rem;
+	border: 2px dotted var(--coffee, #542916);
+	border-radius: 1rem;
+	background: var(--cream, #fefaf0);
+	color: var(--coffee, #542916);
+	text-decoration: none;
+}
+
+	.customer-body .product-card:hover,
+	.customer-body .product-card:focus-visible {
+		background: var(--customer-blue, #88b8ce);
+		color: var(--coffee, #542916);
+	}
+
+.customer-body .product-name {
+	font-weight: 600;
+	font-size: 1.15rem;
+}
+
+.customer-body .product-price {
+	align-self: flex-end;
+}
+
+.customer-body .option-check {
+	min-height: 48px;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+	.customer-body .option-check .form-check-input {
+		width: 1.5rem;
+		height: 1.5rem;
+		margin-top: 0;
+	}
+
+.customer-body .order-number {
+	font-size: 4rem;
+	font-weight: 700;
+	line-height: 1;
+}
