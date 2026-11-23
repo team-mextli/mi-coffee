@@ -1,0 +1,40 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Staff.Supplies.DeleteModel
+@{
+    ViewData["Title"] = "Eliminar insumo";
+}
+
+<h1 class="h3 mb-3">Eliminar insumo</h1>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.Supply is null)
+{
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Supplies/Index">Regresar</a>
+    return;
+}
+
+<dl class="mb-4">
+    <dt>Insumo</dt>
+    <dd>@Model.Supply.Name</dd>
+    <dt>Categoría</dt>
+    <dd>@Model.Supply.Category?.Name</dd>
+    <dt>Existencia</dt>
+    <dd>@Model.Supply.CurrentStock.ToString("0.##") @Model.Supply.Unit</dd>
+</dl>
+
+@if (Model.CanDelete)
+{
+    <p>¿Seguro que quieres eliminar este insumo? No se puede deshacer.</p>
+    <form method="post" class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Eliminar insumo</button>
+        <a class="btn btn-outline-secondary" asp-page="/Staff/Supplies/Index">Cancelar</a>
+    </form>
+}
+else
+{
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Supplies/Index">Regresar</a>
+}

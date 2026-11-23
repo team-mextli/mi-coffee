@@ -1,0 +1,41 @@
+@page
+@model MiCoffee.Web.Pages.Staff.Suppliers.CreateModel
+@{
+    ViewData["Title"] = "Nuevo proveedor";
+}
+
+<h1 class="h3 mb-3">Nuevo proveedor</h1>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label" asp-for="Supplier.Name">Nombre</label>
+        <input class="form-control" asp-for="Supplier.Name" maxlength="100" />
+        <span class="text-danger" asp-validation-for="Supplier.Name"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Supplier.Contact">Contacto</label>
+        <input class="form-control" asp-for="Supplier.Contact" maxlength="100" />
+        <span class="text-danger" asp-validation-for="Supplier.Contact"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Supplier.Note">Nota (opcional)</label>
+        <textarea class="form-control" asp-for="Supplier.Note" rows="3" maxlength="255"></textarea>
+        <span class="text-danger" asp-validation-for="Supplier.Note"></span>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Guardar proveedor</button>
+        <a class="btn btn-outline-secondary" asp-page="/Staff/Suppliers/Index">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

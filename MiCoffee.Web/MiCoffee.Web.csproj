@@ -15,8 +15,13 @@
   <ItemGroup>
     <Folder Include="Cart\" />
     <Folder Include="Helpers\" />
+    <Folder Include="Pages\Shared\Components\SupplyAlerts\" />
+    <Folder Include="Pages\Staff\SupplyCategories\" />
+    <Folder Include="Pages\Staff\Supplies\" />
+    <Folder Include="ViewComponents\" />
     <Folder Include="Pages\Order\" />
     <Folder Include="Pages\Staff\Categories\" />
+    <Folder Include="Pages\Staff\Suppliers\" />
     <Folder Include="Pages\Staff\Orders\" />
     <Folder Include="Pages\Staff\Products\" />
     <Folder Include="Pages\Staff\Options\" />

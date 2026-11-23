@@ -1,0 +1,58 @@
+@page
+@model MiCoffee.Web.Pages.Staff.Suppliers.IndexModel
+@{
+    ViewData["Title"] = "Proveedores";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 mb-0">Proveedores</h1>
+    @if (isAdmin)
+    {
+        <a class="btn btn-primary" asp-page="/Staff/Suppliers/Create">Nuevo proveedor</a>
+    }
+</div>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+else if (!Model.Suppliers.Any())
+{
+    <p>Aún no hay proveedores registrados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Nota</th>
+                    @if (isAdmin)
+                    {
+                        <th></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var supplier in Model.Suppliers)
+                {
+                    <tr>
+                        <td>@supplier.Name</td>
+                        <td>@supplier.Contact</td>
+                        <td>@(supplier.Note ?? "—")</td>
+                        @if (isAdmin)
+                        {
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary" asp-page="/Staff/Suppliers/Edit" asp-route-id="@supplier.SupplierId">Editar</a>
+                                <a class="btn btn-sm btn-outline-danger" asp-page="/Staff/Suppliers/Delete" asp-route-id="@supplier.SupplierId">Eliminar</a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
