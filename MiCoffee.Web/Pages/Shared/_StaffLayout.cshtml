@@ -12,16 +12,44 @@
 </head>
 <body class="staff-body">
     <header class="staff-header">
-        <div class="staff-header-box">
+        <div class="staff-header-box d-flex align-items-center justify-content-between flex-wrap gap-2">
             <a class="staff-brand" href="/Staff">
                 <img class="staff-logo" src="~/images/logo_MiCoffee.png" alt="Logo de MiCoffee" />
                 <span class="staff-brand-name">MiCoffee</span>
             </a>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <nav class="d-flex align-items-center flex-wrap gap-3">
+                    <a class="staff-link" href="/Staff">Inicio</a>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="staff-link" asp-page="/Staff/Users/Index">Usuarios</a>
+                        <span class="staff-link text-muted">Catálogo </span>
+                    }
+
+                    <span class="staff-link text-muted">Órdenes</span>
+                    <span class="staff-link text-muted">Inventario </span>
+                    <span class="staff-link text-muted">Proveedores </span>
+
+                    <span class="fw-semibold">@User.Identity.Name</span>
+
+                    <form method="post" asp-page="/Staff/Logout" class="m-0">
+                        <button type="submit" class="btn btn-sm btn-outline-dark">Cerrar sesión</button>
+                    </form>
+                </nav>
+            }
         </div>
     </header>
 
     <main class="staff-main">
         <div class="staff-content">
+            @if (TempData["Message"] is string message)
+            {
+                <div class="alert alert-success">@message</div>
+            }
+
             @RenderBody()
         </div>
     </main>
