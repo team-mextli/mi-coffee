@@ -1,0 +1,54 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Staff.Supplies.StockModel
+@{
+    ViewData["Title"] = "Existencias";
+}
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.Supply is null)
+{
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Supplies/Index">Regresar</a>
+    return;
+}
+
+<h1 class="h3 mb-1">@Model.Supply.Name</h1>
+<p class="mb-3 text-muted">
+    @Model.Supply.Category?.Name. Proveedor: @(Model.Supply.Supplier?.Name ?? "sin proveedor")
+</p>
+
+<p class="fs-4 mb-4">
+    Existencia actual: <strong>@Model.Supply.CurrentStock.ToString("0.##") @Model.Supply.Unit</strong>
+    <span class="d-block fs-6 text-muted">Límite mínimo: @Model.Supply.MinimumStock.ToString("0.##") @Model.Supply.Unit</span>
+</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-6">
+        <h2 class="h5">Registrar entrada</h2>
+        <p class="small text-muted">Suma la cantidad a la existencia actual.</p>
+        <form method="post" asp-page-handler="Add" asp-route-id="@Model.Supply.SupplyId">
+            <div class="mb-3">
+                <label class="form-label" for="quantity">Cantidad que entra (@Model.Supply.Unit)</label>
+                <input class="form-control" id="quantity" name="quantity" type="number" step="0.01" min="0.01" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar entrada</button>
+        </form>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <h2 class="h5">Hacer un ajuste</h2>
+        <p class="small text-muted">Reemplaza la existencia actual por la cantidad contada.</p>
+        <form method="post" asp-page-handler="Set" asp-route-id="@Model.Supply.SupplyId">
+            <div class="mb-3">
+                <label class="form-label" for="newStock">Existencia real (@Model.Supply.Unit)</label>
+                <input class="form-control" id="newStock" name="newStock" type="number" step="0.01" min="0" required />
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Guardar ajuste</button>
+        </form>
+    </div>
+</div>
+
+<a class="btn btn-outline-secondary" asp-page="/Staff/Supplies/Index">Regresar</a>

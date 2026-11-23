@@ -1,0 +1,28 @@
+@model List<MiCoffee.Entities.Supply>
+
+@if (Model.Any())
+{
+    <div class="alert alert-warning supply-alerts" role="alert">
+        <details>
+            <summary>
+                <strong>Inventario bajo:</strong>
+                @Model.Count @(Model.Count == 1 ? "insumo está" : "insumos están") en su límite mínimo o por debajo
+            </summary>
+            <ul class="mb-0 mt-2">
+                @foreach (var supply in Model)
+                {
+                    <li>
+                        <a asp-page="/Staff/Supplies/Stock" asp-route-id="@supply.SupplyId">@supply.Name</a>:
+                        @supply.CurrentStock.ToString("0.##") @supply.Unit
+                        (mínimo @supply.MinimumStock.ToString("0.##")).
+                        Proveedor: @(supply.Supplier?.Name ?? "sin proveedor")
+                        @if (!string.IsNullOrEmpty(supply.Supplier?.Contact))
+                        {
+                            <span>(@supply.Supplier!.Contact)</span>
+                        }
+                    </li>
+                }
+            </ul>
+        </details>
+    </div>
+}

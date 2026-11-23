@@ -12,6 +12,13 @@ builder.Services.AddRazorPages(options =>
 	options.Conventions.AuthorizeFolder("/Staff/Categories", "AdminOnly");
 	options.Conventions.AuthorizeFolder("/Staff/Products", "AdminOnly");
 	options.Conventions.AuthorizeFolder("/Staff/Options", "AdminOnly");
+	options.Conventions.AuthorizePage("/Staff/Suppliers/Create", "<AdminPolicyName>");
+	options.Conventions.AuthorizePage("/Staff/Suppliers/Edit", "<AdminPolicyName>");
+	options.Conventions.AuthorizePage("/Staff/Suppliers/Delete", "<AdminPolicyName>");
+	options.Conventions.AuthorizePage("/Staff/Supplies/Create", "<AdminPolicyName>");
+	options.Conventions.AuthorizePage("/Staff/Supplies/Edit", "<AdminPolicyName>");
+	options.Conventions.AuthorizePage("/Staff/Supplies/Delete", "<AdminPolicyName>");
+	options.Conventions.AuthorizeFolder("/Staff/SupplyCategories", "<AdminPolicyName>");
 });
 
 builder.Services

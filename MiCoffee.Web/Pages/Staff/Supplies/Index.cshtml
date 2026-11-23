@@ -1,0 +1,69 @@
+@page
+@model MiCoffee.Web.Pages.Staff.Supplies.IndexModel
+@{
+    ViewData["Title"] = "Inventario";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 mb-0">Inventario</h1>
+    @if (isAdmin)
+    {
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-page="/Staff/SupplyCategories/Index">Categorías de insumo</a>
+            <a class="btn btn-primary" asp-page="/Staff/Supplies/Create">Nuevo insumo</a>
+        </div>
+    }
+</div>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+else if (!Model.Supplies.Any())
+{
+    <p>Aún no hay insumos registrados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Insumo</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th class="text-end">Existencia</th>
+                    <th class="text-end">Límite mínimo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var supply in Model.Supplies)
+                {
+                    <tr>
+                        <td>
+                            @supply.Name
+                            @if (Model.AlertIds.Contains(supply.SupplyId))
+                            {
+                                <span class="badge text-bg-warning ms-1">Bajo el límite</span>
+                            }
+                        </td>
+                        <td>@supply.Category?.Name</td>
+                        <td>@(supply.Supplier?.Name ?? "—")</td>
+                        <td class="text-end">@supply.CurrentStock.ToString("0.##") @supply.Unit</td>
+                        <td class="text-end">@supply.MinimumStock.ToString("0.##") @supply.Unit</td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-sm btn-primary" asp-page="/Staff/Supplies/Stock" asp-route-id="@supply.SupplyId">Existencias</a>
+                            @if (isAdmin)
+                            {
+                                <a class="btn btn-sm btn-outline-secondary" asp-page="/Staff/Supplies/Edit" asp-route-id="@supply.SupplyId">Editar</a>
+                                <a class="btn btn-sm btn-outline-danger" asp-page="/Staff/Supplies/Delete" asp-route-id="@supply.SupplyId">Eliminar</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
