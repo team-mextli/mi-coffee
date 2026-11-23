@@ -133,8 +133,15 @@ Sección del contexto: «Proveedores». Tabla: `supplier`. Scope: `suppliers`.
 
 Sección del contexto: «Inventario y alertas». Tablas: `supply_category`, `supply`, con `supplier` para la alerta. Scope: `inventory`.
 
-**Parte A — Contrato.** Entidades `SupplyCategory` y `Supply` (`SupplierId` nullable; `Supplier` cargado en las alertas); `SupplyCategoryService` y `SupplyService` con alta y edición (categoría, unidad, límite mínimo, proveedor), `Delete`, `AddStock` (entrada de mercancía), `SetStock` (ajuste) y `GetAlerts`, que devuelve los `Supply` en alerta.
+**Parte A — Contrato.** Entidades `SupplyCategory` y `Supply` (`SupplierId` nullable; `Category` y `Supplier` cargados en `GetAll`, `GetById` y `GetAlerts`, solo lectura); `SupplyCategoryService` y `SupplyService` con alta y edición (categoría, unidad, límite mínimo, proveedor), `Delete`, `AddStock` (entrada de mercancía), `SetStock` (ajuste) y `GetAlerts`, que devuelve los `Supply` en alerta.
 
-**Parte B — Data.** `GetAlerts` calcula la alerta en la consulta: `current_stock <= minimum_stock`, con unión izquierda a proveedor (`supplier_id` admite nulo). El esquema indica que las alertas no se guardan.
+**Existencias.** `Create` acepta la existencia inicial. `Update` no escribe `current_stock`: después del alta, la existencia solo cambia con `AddStock` y `SetStock`, para que una edición con datos viejos no pise una entrada de mercancía. `AddStock` suma en un solo `UPDATE` (`current_stock = current_stock + @quantity`).
 
-**Parte C — Business.** `current_stock` y `minimum_stock` mayores o iguales a 0 (restricciones del esquema); `AddStock` con cantidad mayor a 0; categoría existente.
+**Parte B — Data.** `GetAll`, `GetById` y `GetAlerts` usan la misma consulta, con unión a categoría y unión izquierda a proveedor (`supplier_id` admite nulo). `GetAlerts` calcula la alerta en la consulta: `current_stock <= minimum_stock`. El esquema indica que las alertas no se guardan.
+
+**Parte C — Business.** `current_stock` y `minimum_stock` entre 0 y 99,999,999.99 (restricciones y rango del esquema); `AddStock` con cantidad mayor a 0 y existencia resultante dentro del máximo; categoría existente y, si se asigna, proveedor existente. Una categoría de insumo con insumos no se elimina (la clave foránea es la guarda); un insumo siempre se puede eliminar.
+
+**Pendientes.**
+
+- Existencia inicial al dar de alta un insumo. **Propuesta:** `Create` la acepta (0 por defecto). Se confirma con Mextli, que construye el formulario.
+- Orden de las listas. **Propuesta:** `GetAll` por categoría y nombre; `GetAlerts` por mayor faltante (`minimum_stock - current_stock`) y nombre.
