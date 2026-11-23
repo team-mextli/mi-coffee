@@ -21,6 +21,11 @@ public class OrderItem
     // cart. Copied to the order so later price changes do not affect it.
     public decimal UnitPrice { get; set; }
 
+    // Name of the product in the catalog, loaded only when an order is read
+    // for the staff. Never taken from a form or a cart: OrderService.Create
+    // ignores it.
+    public string? ProductName { get; set; }
+
     [StringLength(255, ErrorMessage = "La nota admite hasta 255 caracteres.")]
     public string? Note { get; set; }
 
