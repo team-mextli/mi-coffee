@@ -83,7 +83,7 @@ Sección del contexto: «Catálogo (admin)». Tablas: `product_category`, `produ
 
 Sección del contexto: «Pedidos del cliente». Tablas: `customer_order`, `order_item`, `order_item_option`. Scope: `orders`.
 
-**Parte A — Contrato.** Entidades `CustomerOrder` (con su lista de `OrderItem`), `OrderItem` (con su lista de `OrderItemOption`) y `OrderItemOption`; `OrderService.Create(order)`, que devuelve el número de orden; y un método de cálculo de total reutilizable, para que el carrito de Web no replique reglas de negocio.
+**Parte A — Contrato.** Enum `OrderStatus` (`Received`, `InPreparation`, `Ready`, `Delivered`, `Cancelled`, igual que el esquema); entidades `CustomerOrder` (con su lista de `OrderItem`), `OrderItem` (con su lista de `OrderItemOption`) y `OrderItemOption`; `OrderService.Create(order)`, que devuelve el número de orden; y `CalculateLineTotal(item)` y `CalculateTotal(order)`, para que el carrito de Web no replique reglas de negocio.
 
 **Parte B — Data.** Inserción de orden, ítems y opciones en una sola transacción; lectura de producto y opciones para precios.
 
@@ -93,12 +93,11 @@ Sección del contexto: «Pedidos del cliente». Tablas: `customer_order`, `order
 - Cada opción debe estar permitida para el producto (`product_allowed_option`).
 - Una opción no se repite dentro de un mismo ítem.
 - `unit_price` y `extra_price` se leen de la base al confirmar y se copian a la orden, como indican los comentarios del esquema. El total lo calcula Business; no se recibe del cliente.
+- Fórmula de cada línea: `(unit_price + suma de extra_price) × quantity`.
 - El número de orden es `customer_order_id`. El estado inicial es `Received`.
 - La creación no registra fila en `order_status_history`: esa tabla exige `user_id` y el cliente no inicia sesión.
 
 **Trigger de la base de datos.** Solo valida: un trigger `BEFORE INSERT` sobre `order_item` rechaza los productos no disponibles como respaldo de la validación de Business, sin escribir datos. El rechazo llega como `MySqlException` y se traduce a `BusinessException`.
-
-**Pendiente.** Fórmula de cada línea. **Propuesta:** `(unit_price + suma de extra_price) × quantity`.
 
 ---
 
@@ -106,7 +105,7 @@ Sección del contexto: «Pedidos del cliente». Tablas: `customer_order`, `order
 
 Sección del contexto: «Gestión de órdenes (empleado y admin)». Tablas: `customer_order`, `order_status_history`. Scope: `orders`.
 
-**Parte A — Contrato.** Enum `OrderStatus` (`Received`, `InPreparation`, `Ready`, `Delivered`, `Cancelled`, igual que el esquema), entidad `OrderStatusHistory` y, en `OrderService`: `GetActive`, `GetById` (recibo con ítems y opciones), `ChangeStatus(orderId, newStatus, userId)` y `Search(from, to, status)` para el historial.
+**Parte A — Contrato.** Entidad `OrderStatusHistory` y, en `OrderService`: `GetActive`, `GetById` (recibo con ítems y opciones), `ChangeStatus(orderId, newStatus, userId)` y `Search(from, to, status)` para el historial.
 
 **Parte B — Data.** `ChangeStatus` actualiza el estado e inserta el historial en una sola transacción. El `UPDATE` incluye el estado previo en el `WHERE` y se verifica el número de filas afectadas, para que dos cambios simultáneos sobre la misma orden no se pisen. El historial filtra por rango de `created_at` (el filtro incluye el día completo del extremo final) y por estado.
 
