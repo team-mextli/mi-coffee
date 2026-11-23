@@ -98,19 +98,20 @@ public class SupplyRepository
     }
 
     /// <summary>
-    /// Adds quantity to the current stock in a single statement, so two
-    /// simultaneous entries do not overwrite each other.
+    /// Adds quantity to the current stock by calling sp_add_stock, which does
+    /// it in a single statement, so two simultaneous entries do not overwrite
+    /// each other. The database raises error 1644 when quantity is not greater
+    /// than 0, the supply does not exist or the stock would exceed the maximum;
+    /// SupplyService.AddStock checks the same rules first.
     /// </summary>
     public void AddStock(int supplyId, decimal quantity)
     {
         using MySqlConnection cn = Connection.Create();
         cn.Open();
 
-        using MySqlCommand cmd = new(
-            "UPDATE supply SET current_stock = current_stock + @quantity " +
-            "WHERE supply_id = @supply_id;", cn);
-        cmd.Parameters.AddWithValue("@quantity", quantity);
+        using MySqlCommand cmd = new("CALL sp_add_stock(@supply_id, @quantity);", cn);
         cmd.Parameters.AddWithValue("@supply_id", supplyId);
+        cmd.Parameters.AddWithValue("@quantity", quantity);
         cmd.ExecuteNonQuery();
     }
 
