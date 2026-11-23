@@ -361,3 +361,101 @@ WHERE supply_id = 6
 -- =============================================================
 -- Part 3 - Views (Frontend)
 -- =============================================================
+-- Views and transactions written by Mextli (point 18 of the final
+-- project); added to the script by the DBA.
+
+-- -------------------------------------------------------------
+-- V1 v_supply_alert: supplies at or below their minimum, with the
+-- supplier to contact (rules 15 and 16). LEFT JOIN because the
+-- supplier is optional, so a supply without supplier still appears.
+-- -------------------------------------------------------------
+CREATE OR REPLACE VIEW v_supply_alert AS
+SELECT
+    s.supply_id,
+    s.name AS supply_name,
+    sc.name AS category_name,
+    s.unit,
+    s.current_stock,
+    s.minimum_stock,
+    sp.name AS supplier_name,
+    sp.contact AS supplier_contact
+FROM supply s
+JOIN supply_category sc ON s.supply_category_id = sc.supply_category_id
+LEFT JOIN supplier sp ON s.supplier_id = sp.supplier_id
+WHERE s.current_stock <= s.minimum_stock;
+
+-- Expected: 4 rows; Té chai en polvo shows NULL supplier.
+SELECT * FROM v_supply_alert ORDER BY supply_name;
+
+-- -------------------------------------------------------------
+-- V2 v_order_receipt: detail of each order with its products, the
+-- prices charged and the chosen options (rules 7 and 8). One row per
+-- chosen option; products without options appear once with NULL.
+-- product_subtotal is quantity * unit_price, without options.
+-- -------------------------------------------------------------
+CREATE OR REPLACE VIEW v_order_receipt AS
+SELECT
+    co.customer_order_id,
+    co.created_at,
+    co.customer_name,
+    co.status,
+    oi.order_item_id,
+    p.name AS product_name,
+    oi.quantity,
+    oi.unit_price,
+    (oi.quantity * oi.unit_price) AS product_subtotal,
+    po.name AS option_name,
+    oio.extra_price AS option_extra_price,
+    oi.note
+FROM customer_order co
+JOIN order_item oi ON co.customer_order_id = oi.customer_order_id
+JOIN product p ON oi.product_id = p.product_id
+LEFT JOIN order_item_option oio ON oi.order_item_id = oio.order_item_id
+LEFT JOIN product_option po ON oio.product_option_id = po.product_option_id;
+
+-- Expected for order 8: 3 rows (Latte with Mediano, Latte with
+-- Jarabe de vainilla, Pay de queso without options).
+SET @orden = 8;
+SELECT * FROM v_order_receipt WHERE customer_order_id = @orden;
+
+-- =============================================================
+-- Part 4 - Transactions
+-- These blocks change data, so they are commented out and run by
+-- hand after seed.sql: select a block without the leading "-- "
+-- and run it. To repeat them, run schema.sql, routines_tests.sql and
+-- seed.sql again first.
+-- =============================================================
+
+-- -------------------------------------------------------------
+-- T1 COMMIT: move order 11 (Received in seed.sql) to InPreparation
+-- and record the change in the history, both or none (rule 11).
+-- -------------------------------------------------------------
+-- SET @orden   = 11;
+-- SET @usuario = 1;
+-- START TRANSACTION;
+-- UPDATE customer_order
+-- SET status = 'InPreparation'
+-- WHERE customer_order_id = @orden;
+-- INSERT INTO order_status_history
+--     (customer_order_id, user_id, previous_status, new_status, changed_at)
+-- VALUES
+--     (@orden, @usuario, 'Received', 'InPreparation', NOW());
+-- COMMIT;
+-- SELECT customer_order_id, status FROM customer_order WHERE customer_order_id = @orden;
+-- SELECT * FROM order_status_history WHERE customer_order_id = @orden;
+-- Expected: order 11 is InPreparation and the history has the new row.
+
+-- -------------------------------------------------------------
+-- T2 ROLLBACK: an order whose item fails is undone completely
+-- (rule 7, at least one product). Turn off "stop script execution on
+-- errors" in Workbench so the ROLLBACK runs after the error.
+-- -------------------------------------------------------------
+-- START TRANSACTION;
+-- INSERT INTO customer_order (created_at, customer_name, total, status)
+-- VALUES (NOW(), 'Prueba rollback', 50.00, 'Received');
+-- SET @orden_nueva = LAST_INSERT_ID();
+-- INSERT INTO order_item (customer_order_id, product_id, quantity, unit_price, note)
+-- VALUES (@orden_nueva, 999999, 1, 50.00, NULL);
+-- ROLLBACK;
+-- SELECT COUNT(*) AS ordenes_con_ese_id FROM customer_order WHERE customer_order_id = @orden_nueva;
+-- Expected: the second INSERT fails with error 1452 and the count is 0.
