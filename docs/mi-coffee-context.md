@@ -88,7 +88,7 @@ La sesión del personal expira a las 8 horas del inicio de sesión y se cierra a
 ### Gestión de órdenes (empleado y admin)
 
 - Cada orden confirmada llega a la lista del personal como recibo: número de orden, fecha y hora, productos con sus opciones y total.
-- Estados: Recibida → En preparación → Lista → Entregada. Una orden también puede quedar Cancelada. El personal cambia el estado.
+- Estados: Recibida → En preparación → Lista → Entregada, un paso a la vez. Una orden se puede cancelar mientras está en Recibida, En preparación o Lista; Entregada y Cancelada son finales. El personal cambia el estado.
 - Trazabilidad: cada cambio de estado registra quién lo hizo y cuándo. Las órdenes no se borran. El historial se puede consultar filtrando por fecha y estado.
 
 ### Catálogo (admin)
