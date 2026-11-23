@@ -245,20 +245,20 @@ DELIMITER ;
 -- runs without stopping; select one statement without the leading
 -- "-- " and run only the selection.
 -- -------------------------------------------------------------
--- Invalid: Frappé de matcha (product 8) is not available (error 1644)
+-- TRG-03 Invalid: Frappé de matcha (product 8) is not available (error 1644)
 -- INSERT INTO order_item (customer_order_id, product_id, quantity, unit_price) VALUES (12, 8, 1, 60.00);
 
--- Valid: Té verde (product 10) is available; the row is inserted and then removed
+-- TRG-04 Valid: Té verde (product 10) is available; the row is inserted and then removed
 -- INSERT INTO order_item (customer_order_id, product_id, quantity, unit_price) VALUES (12, 10, 1, 32.00);
 -- DELETE FROM order_item WHERE customer_order_id = 12 AND product_id = 10;
 
--- Invalid: order 1 is Delivered, a final status (error 1644)
+-- TRG-01 Invalid: order 1 is Delivered, a final status (error 1644)
 -- UPDATE customer_order SET status = 'Received' WHERE customer_order_id = 1;
 
 -- Invalid: order 11 is Received, it cannot skip InPreparation (error 1644)
 -- UPDATE customer_order SET status = 'Ready' WHERE customer_order_id = 11;
 
--- Valid: order 11 is Received; the change is rolled back so the seed stays intact
+-- TRG-02 Valid: order 11 is Received; the change is rolled back so the seed stays intact
 -- START TRANSACTION;
 -- UPDATE customer_order SET status = 'InPreparation' WHERE customer_order_id = 11;
 -- ROLLBACK;
