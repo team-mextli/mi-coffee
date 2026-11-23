@@ -13,6 +13,17 @@ public class OrderService
     private readonly OrderRepository _repository = new();
     private readonly ProductRepository _productRepository = new();
 
+    // Allowed status changes: one step forward, or cancel while the order is
+    // not final. Delivered and Cancelled have no next status.
+    private static readonly Dictionary<OrderStatus, OrderStatus[]> NextStatuses = new()
+    {
+        [OrderStatus.Received] = new[] { OrderStatus.InPreparation, OrderStatus.Cancelled },
+        [OrderStatus.InPreparation] = new[] { OrderStatus.Ready, OrderStatus.Cancelled },
+        [OrderStatus.Ready] = new[] { OrderStatus.Delivered, OrderStatus.Cancelled },
+        [OrderStatus.Delivered] = Array.Empty<OrderStatus>(),
+        [OrderStatus.Cancelled] = Array.Empty<OrderStatus>()
+    };
+
     /// <summary>
     /// Validates the order, copies the current catalog prices to it,
     /// calculates its total and saves it with its items and options in a
@@ -95,6 +106,90 @@ public class OrderService
     {
         Dictionary<int, Product?> products = new();
         return order.Items.Sum(item => PriceItem(item, products));
+    }
+
+    /// <summary>
+    /// Orders in Received, InPreparation or Ready, from the oldest to the
+    /// newest, each with Items, their Options and the product and option
+    /// names loaded. StatusHistory is not loaded.
+    /// </summary>
+    public List<CustomerOrder> GetActive()
+    {
+        return _repository.GetActive();
+    }
+
+    /// <summary>
+    /// Returns one order as a receipt: Items, their Options with the product
+    /// and option names, and StatusHistory from the oldest change to the
+    /// newest. Returns null when the order does not exist.
+    /// </summary>
+    public CustomerOrder? GetById(int orderId)
+    {
+        return _repository.GetById(orderId);
+    }
+
+    /// <summary>
+    /// Statuses an order can move to from the given status, so Web can offer
+    /// only valid changes without repeating the rule. Empty for Delivered and
+    /// Cancelled.
+    /// </summary>
+    public IReadOnlyList<OrderStatus> GetNextStatuses(OrderStatus current)
+    {
+        return NextStatuses.TryGetValue(current, out OrderStatus[]? next)
+            ? next
+            : Array.Empty<OrderStatus>();
+    }
+
+    /// <summary>
+    /// Changes the status of the order and records who changed it, in a
+    /// single transaction. userId is the user who made the change.
+    /// </summary>
+    /// <exception cref="BusinessException">
+    /// userId below 1, the order does not exist, the new status is not one of
+    /// GetNextStatuses for its current status, or the order changed status
+    /// while this change was being saved.
+    /// </exception>
+    public void ChangeStatus(int orderId, OrderStatus newStatus, int userId)
+    {
+        if (userId < 1)
+        {
+            throw new BusinessException("El usuario que realiza el cambio es obligatorio.");
+        }
+
+        OrderStatus current = _repository.GetStatus(orderId)
+            ?? throw new BusinessException("La orden no existe.");
+
+        if (!GetNextStatuses(current).Contains(newStatus))
+        {
+            throw new BusinessException(
+                "La orden no puede pasar a ese estado desde su estado actual.");
+        }
+
+        // False means the order changed status after it was read above, or
+        // the database rejected the change as a backup of the rule above.
+        if (!_repository.ChangeStatus(orderId, current, newStatus, userId))
+        {
+            throw new BusinessException(
+                "La orden cambió de estado mientras se actualizaba. Actualiza la lista e inténtalo de nuevo.");
+        }
+    }
+
+    /// <summary>
+    /// Order history without items, from the newest to the oldest. Every
+    /// filter is optional: fromDate and toDate select the creation date (both
+    /// days included) and status the current status of the order.
+    /// </summary>
+    /// <exception cref="BusinessException">
+    /// fromDate is later than toDate.
+    /// </exception>
+    public List<CustomerOrder> Search(DateOnly? fromDate, DateOnly? toDate, OrderStatus? status)
+    {
+        if (fromDate is not null && toDate is not null && fromDate > toDate)
+        {
+            throw new BusinessException("La fecha inicial no puede ser posterior a la final.");
+        }
+
+        return _repository.Search(fromDate, toDate, status);
     }
 
     // Validates one line, copies the catalog prices into it and returns its
