@@ -13,7 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Cart\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Pages\Order\" />
     <Folder Include="Pages\Staff\Categories\" />
+    <Folder Include="Pages\Staff\Orders\" />
     <Folder Include="Pages\Staff\Products\" />
     <Folder Include="Pages\Staff\Options\" />
     <Folder Include="wwwroot\images\" />

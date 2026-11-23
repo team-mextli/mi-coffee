@@ -1,0 +1,59 @@
+@page
+@using MiCoffee.Web.Helpers
+@model MiCoffee.Web.Pages.Staff.Orders.IndexModel
+@{
+    ViewData["Title"] = "Órdenes";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 mb-0">Órdenes activas</h1>
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Orders/History">Historial</a>
+</div>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+else if (!Model.Orders.Any())
+{
+    <p>No hay órdenes activas.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Orden</th>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th class="text-end">Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td>#@order.CustomerOrderId</td>
+                        <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@(order.CustomerName ?? "—")</td>
+                        <td><span class="badge @OrderStatusLabels.BadgeClass(order.Status)">@OrderStatusLabels.Text(order.Status)</span></td>
+                        <td class="text-end">$@order.Total.ToString("N2")</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-primary" asp-page="/Staff/Orders/Details" asp-route-id="@order.CustomerOrderId">Ver</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // No real-time channel: the list is refreshed periodically.
+        setTimeout(function () { window.location.reload(); }, 30000);
+    </script>
+}

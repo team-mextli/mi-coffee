@@ -1,0 +1,14 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Order.ConfirmationModel
+@{
+    Layout = "_CustomerLayout";
+    ViewData["Title"] = "Pedido recibido";
+}
+
+<div class="text-center py-4">
+    <h1 class="h3">¡Pedido recibido!</h1>
+    <p class="mb-1">Tu número de orden es</p>
+    <p class="order-number">@Model.OrderId</p>
+    <p>Espera a que te llamemos con este número.</p>
+    <a class="btn btn-primary" asp-page="/Index">Hacer otro pedido</a>
+</div>
