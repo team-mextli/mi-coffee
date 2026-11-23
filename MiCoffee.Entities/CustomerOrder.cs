@@ -23,4 +23,8 @@ public class CustomerOrder
     public OrderStatus Status { get; set; } = OrderStatus.Received;
 
     public List<OrderItem> Items { get; set; } = new();
+
+    // Loaded only when a single order is read for its receipt; empty
+    // otherwise. Never taken from a form: OrderService.Create ignores it.
+    public List<OrderStatusHistory> StatusHistory { get; set; } = new();
 }
