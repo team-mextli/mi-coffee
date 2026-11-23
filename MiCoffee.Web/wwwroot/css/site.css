@@ -313,3 +313,20 @@
 	.staff-link:hover {
 		text-decoration: underline;
 	}
+
+.staff-body .dropdown-menu {
+	background-color: var(--mc-cream);
+	border: 2px dashed var(--mc-card-border);
+	border-radius: 14px;
+}
+
+.staff-body .dropdown-item {
+	color: var(--mc-brown);
+	font-weight: 500;
+}
+
+	.staff-body .dropdown-item:hover,
+	.staff-body .dropdown-item:focus {
+		background-color: var(--mc-amber);
+		color: var(--mc-brown);
+	}

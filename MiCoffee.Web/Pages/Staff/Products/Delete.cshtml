@@ -1,0 +1,42 @@
+@page "{id:int}"
+@model MiCoffee.Web.Pages.Staff.Products.DeleteModel
+@{
+    ViewData["Title"] = "Eliminar producto";
+}
+
+<h1 class="h3 mb-3 text-center">Eliminar producto</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="alert alert-danger mc-form">@Model.Error</div>
+}
+
+@if (Model.Product is not null)
+{
+    <div class="mc-card mc-form">
+        <p class="mb-1">Producto: <strong>@Model.Product.Name</strong></p>
+        <p class="mb-1">Categoría: <strong>@Model.Product.Category?.Name</strong></p>
+        <p class="mb-4">Precio base: <strong>$@Model.Product.BasePrice.ToString("N2")</strong></p>
+
+        @if (Model.CanDelete)
+        {
+            <p>¿Seguro que quieres eliminarlo? También se quitarán sus opciones permitidas. Esta acción no se puede deshacer.</p>
+
+            <form method="post">
+                <button type="submit" class="btn btn-primary">Eliminar</button>
+                <a asp-page="./Index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        }
+        else
+        {
+            <a asp-page="./Edit" asp-route-id="@Model.Product.ProductId" class="btn btn-primary">Editar producto</a>
+            <a asp-page="./Index" class="btn btn-secondary">Regresar</a>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <a asp-page="./Index" class="btn btn-secondary">Regresar</a>
+    </div>
+}
