@@ -15,9 +15,10 @@ internal static class MySqlErrors
     }
 
     /// <summary>
-    /// True when a trigger rejected the statement with SIGNAL. Without an
-    /// explicit MYSQL_ERRNO, SIGNAL SQLSTATE '45000' is reported as 1644.
-    /// Confirm the number against the real trigger before relying on it.
+    /// True when a trigger or a stored procedure rejected the statement with
+    /// SIGNAL. Without an explicit MYSQL_ERRNO, SIGNAL SQLSTATE '45000' is
+    /// reported as 1644 (confirmed on MySQL 8.0 with the triggers and
+    /// procedures of routines_tests.sql).
     /// </summary>
     public static bool IsRejectedByTrigger(MySqlException ex)
     {
