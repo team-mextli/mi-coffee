@@ -162,55 +162,33 @@ public class OrderRepository
     }
 
     /// <summary>
-    /// Changes the status and inserts the history row in one transaction. The
-    /// UPDATE only applies while the order still has previousStatus, so two
-    /// simultaneous changes cannot overwrite each other. Returns false,
+    /// Changes the status and records who changed it by calling
+    /// sp_change_order_status, which runs both writes in one transaction.
+    /// The change only applies while the order still has previousStatus, so
+    /// two simultaneous changes cannot overwrite each other. Returns false,
     /// without changes, when the order no longer has previousStatus or when
-    /// the database rejects the change as a transition that is not allowed.
+    /// the database rejects the change (a transition that is not allowed, an
+    /// order that does not exist or a status that is not valid).
     /// </summary>
     public bool ChangeStatus(int orderId, OrderStatus previousStatus, OrderStatus newStatus, int userId)
     {
         using MySqlConnection cn = Connection.Create();
         cn.Open();
-        using MySqlTransaction tx = cn.BeginTransaction();
 
         try
         {
-            int updated;
-            using (MySqlCommand cmd = new(
-                "UPDATE customer_order SET status = @new_status " +
-                "WHERE customer_order_id = @customer_order_id AND status = @previous_status;", cn, tx))
-            {
-                cmd.Parameters.AddWithValue("@new_status", newStatus.ToString());
-                cmd.Parameters.AddWithValue("@customer_order_id", orderId);
-                cmd.Parameters.AddWithValue("@previous_status", previousStatus.ToString());
-                updated = cmd.ExecuteNonQuery();
-            }
+            using MySqlCommand cmd = new(
+                "CALL sp_change_order_status(@customer_order_id, @previous_status, @new_status, @user_id);", cn);
+            cmd.Parameters.AddWithValue("@customer_order_id", orderId);
+            cmd.Parameters.AddWithValue("@previous_status", previousStatus.ToString());
+            cmd.Parameters.AddWithValue("@new_status", newStatus.ToString());
+            cmd.Parameters.AddWithValue("@user_id", userId);
+            cmd.ExecuteNonQuery();
 
-            if (updated == 0)
-            {
-                tx.Rollback();
-                return false;
-            }
-
-            using (MySqlCommand cmd = new(
-                "INSERT INTO order_status_history " +
-                "(customer_order_id, user_id, previous_status, new_status) " +
-                "VALUES (@customer_order_id, @user_id, @previous_status, @new_status);", cn, tx))
-            {
-                cmd.Parameters.AddWithValue("@customer_order_id", orderId);
-                cmd.Parameters.AddWithValue("@user_id", userId);
-                cmd.Parameters.AddWithValue("@previous_status", previousStatus.ToString());
-                cmd.Parameters.AddWithValue("@new_status", newStatus.ToString());
-                cmd.ExecuteNonQuery();
-            }
-
-            tx.Commit();
             return true;
         }
         catch (MySqlException ex) when (MySqlErrors.IsRejectedByTrigger(ex))
         {
-            tx.Rollback();
             return false;
         }
     }
