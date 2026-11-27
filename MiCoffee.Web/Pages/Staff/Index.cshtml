@@ -5,4 +5,100 @@
     ViewData["Title"] = "Inicio";
 }
 
-<h1>Panel del personal</h1>
+@functions {
+    private static string Show(int? number) => number?.ToString() ?? "—";
+}
+
+<h1 class="mb-1">Panel del personal</h1>
+<p class="mb-4">Hola, <strong>@User.Identity?.Name</strong> · @Model.RoleName</p>
+
+<h2 class="h3 mb-3">Órdenes en curso</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+        <a asp-page="/Staff/Orders/Index" class="dash-card">
+            <span class="dash-number">@Show(Model.ReceivedCount)</span>
+            <span class="dash-label">Recibidas</span>
+        </a>
+    </div>
+    <div class="col-12 col-md-4">
+        <a asp-page="/Staff/Orders/Index" class="dash-card">
+            <span class="dash-number">@Show(Model.InPreparationCount)</span>
+            <span class="dash-label">En preparación</span>
+        </a>
+    </div>
+    <div class="col-12 col-md-4">
+        <a asp-page="/Staff/Orders/Index" class="dash-card">
+            <span class="dash-number">@Show(Model.ReadyCount)</span>
+            <span class="dash-label">Listas</span>
+        </a>
+    </div>
+</div>
+
+<h2 class="h3 mb-3">Resumen</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+        <a asp-page="/Staff/Orders/History"
+           asp-route-FromDate="@Model.TodayText"
+           asp-route-ToDate="@Model.TodayText"
+           class="dash-card">
+            <span class="dash-number">@Show(Model.TodayCount)</span>
+            <span class="dash-label">Órdenes de hoy</span>
+            <span class="dash-text">Ver en el historial</span>
+        </a>
+    </div>
+    <div class="col-12 col-md-4">
+        <a asp-page="/Staff/Supplies/Index" class="dash-card @(Model.LowStockCount > 0 ? "dash-card-alert" : "")">
+            <span class="dash-number">@Show(Model.LowStockCount)</span>
+            <span class="dash-label">Insumos bajo el límite</span>
+            <span class="dash-text">@(Model.LowStockCount == 0 ? "Todo en orden" : "Ver inventario")</span>
+        </a>
+    </div>
+    <div class="col-12 col-md-4">
+        <a asp-page="/Staff/Suppliers/Index" class="dash-card">
+            <span class="dash-number">@Show(Model.SupplierCount)</span>
+            <span class="dash-label">Proveedores</span>
+            <span class="dash-text">Ver contactos</span>
+        </a>
+    </div>
+</div>
+
+@if (User.IsInRole("Admin"))
+{
+    <h2 class="h3 mb-3">Administración</h2>
+
+    <div class="row g-3">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a asp-page="/Staff/Products/Index" class="dash-card">
+                <span class="dash-number">@Show(Model.ProductCount)</span>
+                <span class="dash-label">Productos</span>
+                @if (Model.UnavailableProductCount is not null)
+                {
+                    <span class="dash-text">@Model.UnavailableProductCount no disponibles</span>
+                }
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a asp-page="/Staff/Categories/Index" class="dash-card">
+                <span class="dash-number">@Show(Model.CategoryCount)</span>
+                <span class="dash-label">Categorías</span>
+                <span class="dash-text">Agrupan el menú</span>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a asp-page="/Staff/Options/Index" class="dash-card">
+                <span class="dash-number">@Show(Model.OptionCount)</span>
+                <span class="dash-label">Opciones</span>
+                <span class="dash-text">Tamaño, leche y extras</span>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a asp-page="/Staff/Users/Index" class="dash-card">
+                <span class="dash-number">@Show(Model.UserCount)</span>
+                <span class="dash-label">Usuarios</span>
+                <span class="dash-text">Personal registrado</span>
+            </a>
+        </div>
+    </div>
+}

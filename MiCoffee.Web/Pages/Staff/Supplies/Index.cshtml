@@ -26,7 +26,7 @@ else if (!Model.Supplies.Any())
 }
 else
 {
-    <div class="table-responsive">
+    <div class="mc-card table-responsive">
         <table class="table align-middle">
             <thead>
                 <tr>
@@ -46,7 +46,7 @@ else
                             @supply.Name
                             @if (Model.AlertIds.Contains(supply.SupplyId))
                             {
-                                <span class="badge text-bg-warning ms-1">Bajo el límite</span>
+                                <span class="badge status-low ms-1">Bajo el límite</span>
                             }
                         </td>
                         <td>@supply.Category?.Name</td>

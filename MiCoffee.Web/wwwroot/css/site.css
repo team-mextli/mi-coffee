@@ -4,23 +4,27 @@
 	--mc-cream: #fefaf0;
 	--mc-brown: #542916;
 	--mc-amber: #f1c166;
-	--mc-card-bg: #c9c6bd;
+	--mc-card-bg: #e9e7e2;
 	--mc-card-border: #6e290d;
 	--mc-input-border: #6e290d;
 	--mc-btn-main: #542916;
 	--mc-btn-main-hover: #834930;
 	--mc-btn-soft: #a13a10;
-	--mc-btn-soft-hover: #c75a2e; /**/
+	--mc-btn-soft-hover: #c75a2e;
 	--mc-table-head: #a13a10;
 	--mc-table-line: #6e290d;
-	--mc-ok-bg: #e4f2e7; /* aviso de éxito */
+	--mc-ok-bg: #e4f2e7; 
 	--mc-ok-border: #6aa57a;
 	--mc-ok-text: #2f5d3a;
-	--mc-error-bg: #fbe3df; /* aviso de error */
+	--mc-error-bg: #fbe3df; 
 	--mc-error-border: #c9695c;
 	--mc-error-text: #7a2a20;
 	--mc-badge-active: #1abe6f;
 	--mc-badge-inactive: #6392a7;
+	--mc-status-received: #8a6a58;
+	--mc-status-preparing: #b85c1a;
+	--mc-status-ready: #2f7f79;
+	--mc-status-low: #8f2d3a;
 }
 
 .customer-body {
@@ -331,7 +335,6 @@
 		color: var(--mc-brown);
 	}
 
-/* Phase 3 - customer ordering. Append to wwwroot/css/site.css (additions only). */
 .customer-body .btn {
 	min-height: 48px;
 	min-width: 48px;
@@ -387,4 +390,236 @@
 	font-size: 4rem;
 	font-weight: 700;
 	line-height: 1;
+}
+
+.customer-body .btn {
+	border-radius: 999px;
+	border-width: 2px;
+	font-weight: 600;
+	padding: 0.5rem 1.4rem;
+}
+
+.customer-body .btn-primary {
+	background-color: var(--mc-btn-main);
+	border-color: var(--mc-btn-main);
+	color: var(--mc-cream);
+}
+
+	.customer-body .btn-primary:hover,
+	.customer-body .btn-primary:focus,
+	.customer-body .btn-primary:active {
+		background-color: var(--mc-btn-main-hover);
+		border-color: var(--mc-btn-main-hover);
+		color: var(--mc-cream);
+	}
+
+.customer-body .btn-secondary {
+	background-color: var(--mc-btn-soft);
+	border-color: var(--mc-btn-soft);
+	color: var(--mc-cream);
+}
+
+	.customer-body .btn-secondary:hover,
+	.customer-body .btn-secondary:focus {
+		background-color: var(--mc-btn-soft-hover);
+		border-color: var(--mc-btn-soft-hover);
+		color: var(--mc-cream);
+	}
+
+.customer-body .btn-outline-primary {
+	color: var(--mc-btn-main);
+	border-color: var(--mc-btn-main);
+	background-color: var(--mc-cream);
+}
+
+	.customer-body .btn-outline-primary:hover {
+		background-color: var(--mc-btn-main);
+		border-color: var(--mc-btn-main);
+		color: var(--mc-cream);
+	}
+
+.staff-header,
+.customer-header {
+	position: sticky;
+	top: 0;
+	z-index: 1030;
+	box-shadow: 0 3px 0 rgba(84, 41, 22, 0.12);
+}
+
+html {
+	scroll-padding-top: 120px;
+}
+
+.customer-body .form-label {
+	font-weight: 600;
+	color: var(--mc-brown);
+}
+
+.customer-body .form-control,
+.customer-body .form-select {
+	background-color: #fff;
+	color: var(--mc-brown);
+	border: 2px dashed var(--mc-input-border);
+	border-radius: 12px;
+	padding: 0.55rem 0.9rem;
+	min-height: 48px;
+}
+
+	.customer-body .form-control:focus,
+	.customer-body .form-select:focus {
+		border-style: solid;
+		border-color: var(--mc-brown);
+		box-shadow: 0 0 0 0.2rem rgba(136, 184, 206, 0.35);
+	}
+
+.customer-body .form-text {
+	color: #8a6a58;
+}
+
+.customer-body .form-check {
+	padding-left: 2.4em;
+	min-height: 1.8em;
+	margin-bottom: 0.9rem;
+}
+
+.customer-body .form-check-input {
+	width: 1.7em;
+	height: 1.7em;
+	margin-left: -2.4em;
+	background-color: #fff;
+	border: 2px dashed var(--mc-input-border);
+	cursor: pointer;
+}
+
+	.customer-body .form-check-input:checked {
+		background-color: var(--mc-btn-main);
+		border: 2px solid var(--mc-btn-main);
+	}
+
+	.customer-body .form-check-input:focus {
+		border-color: var(--mc-brown);
+		box-shadow: 0 0 0 0.2rem rgba(136, 184, 206, 0.35);
+	}
+
+.customer-body .form-check-label {
+	padding-top: 0.2rem;
+	cursor: pointer;
+}
+
+.customer-body .btn-outline-secondary {
+	color: var(--mc-brown);
+	border-color: var(--mc-btn-soft);
+	background-color: var(--mc-cream);
+}
+
+	.customer-body .btn-outline-secondary:hover {
+		background-color: var(--mc-btn-soft);
+		border-color: var(--mc-btn-soft);
+		color: var(--mc-cream);
+	}
+
+.customer-body .alert {
+	border: 2px dashed;
+	border-radius: 14px;
+}
+
+.customer-body .alert-danger {
+	background-color: var(--mc-error-bg);
+	border-color: var(--mc-error-border);
+	color: var(--mc-error-text);
+}
+
+.customer-body .alert-success {
+	background-color: var(--mc-ok-bg);
+	border-color: var(--mc-ok-border);
+	color: var(--mc-ok-text);
+}
+
+.customer-body .option-group {
+	border: 2px dashed var(--mc-card-border);
+	border-radius: 18px;
+	padding: 1rem 1.25rem 0.4rem;
+	margin-bottom: 1rem;
+}
+
+.staff-body a:not(.btn):not(.dropdown-item):not(.staff-link):not(.staff-brand) {
+	color: var(--mc-btn-soft);
+	font-weight: 600;
+	text-decoration: underline dashed;
+	text-underline-offset: 3px;
+}
+
+	.staff-body a:not(.btn):not(.dropdown-item):not(.staff-link):not(.staff-brand):hover,
+	.staff-body a:not(.btn):not(.dropdown-item):not(.staff-link):not(.staff-brand):focus {
+		color: var(--mc-brown);
+		text-decoration-style: solid;
+	}
+
+.staff-body .badge.status-received {
+	background-color: var(--mc-status-received);
+	color: #fff;
+}
+
+.staff-body .badge.status-preparing {
+	background-color: var(--mc-status-preparing);
+	color: #fff;
+}
+
+.staff-body .badge.status-ready {
+	background-color: var(--mc-status-ready);
+	color: #fff;
+}
+
+.staff-body .badge.status-low {
+	background-color: var(--mc-status-low);
+	color: #fff;
+}
+
+/* Panel del personal */
+.dash-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.25rem;
+	height: 100%;
+	padding: 1rem 1.25rem;
+	background-color: #fff;
+	border: 2px dashed var(--mc-card-border);
+	border-radius: 18px;
+	box-shadow: 0 4px 0 rgba(84, 41, 22, 0.08);
+	color: var(--mc-brown) !important;
+	text-decoration: none !important;
+}
+
+	.dash-card:hover,
+	.dash-card:focus {
+		background-color: var(--mc-amber);
+		color: var(--mc-brown) !important;
+		text-decoration: none !important;
+	}
+
+.dash-number {
+	font-family: "Chelsea Market", Georgia, serif;
+	font-size: 2.6rem;
+	line-height: 1;
+}
+
+.dash-label {
+	font-weight: 600;
+}
+
+.dash-title {
+	font-weight: 700;
+	font-size: 1.1rem;
+}
+
+.dash-text {
+	font-size: 0.95rem;
+	font-weight: 400;
+	color: #8a6a58;
+}
+
+.dash-card:hover .dash-text,
+.dash-card:focus .dash-text {
+	color: var(--mc-brown);
 }
