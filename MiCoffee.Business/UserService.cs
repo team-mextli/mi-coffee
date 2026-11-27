@@ -33,7 +33,21 @@ public class UserService
         PasswordVerificationResult result =
             _hasher.VerifyHashedPassword(user, user.PasswordHash, password);
 
-        return result == PasswordVerificationResult.Failed ? null : user;
+        if (result == PasswordVerificationResult.Failed)
+        {
+            return null;
+        }
+
+        if (result == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            // The stored hash uses outdated parameters: upgrade it while the
+            // plain password is available.
+            string newHash = _hasher.HashPassword(user, password);
+            _repository.UpdatePasswordHash(user.UserId, user.PasswordHash, newHash);
+            user.PasswordHash = newHash;
+        }
+
+        return user;
     }
 
     public List<User> GetAll()
