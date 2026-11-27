@@ -61,7 +61,9 @@ public class CartModel : PageModel
             int orderId = _orderService.Create(order);
 
             CartSession.Clear(HttpContext.Session);
-            return RedirectToPage("/Order/Confirmation", new { id = orderId });
+            // TempData is read once, so only this browser can open its confirmation.
+            TempData["OrderId"] = orderId.ToString();
+            return RedirectToPage("/Order/Confirmation");
         }
         catch (BusinessException ex)
         {
