@@ -12,8 +12,8 @@ builder.Services.AddRazorPages(options =>
 	options.Conventions.AuthorizeFolder("/Staff/Categories", "AdminOnly");
 	options.Conventions.AuthorizeFolder("/Staff/Products", "AdminOnly");
 	options.Conventions.AuthorizeFolder("/Staff/Options", "AdminOnly");
-  
-  options.Conventions.AuthorizePage("/Staff/Suppliers/Create", "AdminOnly");
+
+	options.Conventions.AuthorizePage("/Staff/Suppliers/Create", "AdminOnly");
 	options.Conventions.AuthorizePage("/Staff/Suppliers/Edit", "AdminOnly");
 	options.Conventions.AuthorizePage("/Staff/Suppliers/Delete", "AdminOnly");
 	options.Conventions.AuthorizePage("/Staff/Supplies/Create", "AdminOnly");
@@ -27,7 +27,7 @@ builder.Services
 	.AddCookie(options =>
 	{
 		options.LoginPath = "/Staff/Login";
-		options.AccessDeniedPath = "/Staff/Login";
+		options.AccessDeniedPath = "/Staff/AccessDenied";
 		options.ExpireTimeSpan = TimeSpan.FromHours(8);
 		options.SlidingExpiration = false;
 	});
