@@ -23,6 +23,8 @@
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <h1 class="h3 mb-0">Orden #@order.CustomerOrderId</h1>
     <span class="badge fs-6 @OrderStatusLabels.BadgeClass(order.Status)">@OrderStatusLabels.Text(order.Status)</span>
+    <a class="btn btn-outline-secondary" asp-page="/Staff/Orders/Index">Regresar</a>
+
 </div>
 
 <p class="mb-1"><strong>Fecha y hora:</strong> @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
@@ -130,4 +132,3 @@ else
     </div>
 }
 
-<a class="btn btn-outline-secondary" asp-page="/Staff/Orders/Index">Regresar</a>

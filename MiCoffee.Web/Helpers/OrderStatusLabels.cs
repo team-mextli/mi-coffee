@@ -20,13 +20,13 @@ public static class OrderStatusLabels
 
     public static string BadgeClass(OrderStatus status) => status switch
     {
-        OrderStatus.Received => "text-bg-secondary",
-        OrderStatus.InPreparation => "text-bg-warning",
-        OrderStatus.Ready => "text-bg-info",
-        OrderStatus.Delivered => "text-bg-success",
-        OrderStatus.Cancelled => "text-bg-danger",
-        _ => "text-bg-light"
-    };
+		OrderStatus.Received => "status-received",
+		OrderStatus.InPreparation => "status-preparing",
+		OrderStatus.Ready => "status-ready",
+		OrderStatus.Delivered => "bg-success",
+		OrderStatus.Cancelled => "bg-danger",
+		_ => "text-bg-light"
+	};
 
     // Text of the button that moves an order to the given status.
     public static string ActionText(OrderStatus status) => status switch

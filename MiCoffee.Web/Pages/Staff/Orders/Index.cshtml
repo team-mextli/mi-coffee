@@ -20,7 +20,7 @@ else if (!Model.Orders.Any())
 }
 else
 {
-    <div class="table-responsive">
+    <div class="mc-card table-responsive">
         <table class="table align-middle">
             <thead>
                 <tr>
@@ -53,7 +53,6 @@ else
 
 @section Scripts {
     <script>
-        // No real-time channel: the list is refreshed periodically.
         setTimeout(function () { window.location.reload(); }, 30000);
     </script>
 }
