@@ -12,7 +12,6 @@ public class ProductService
 
     private readonly ProductRepository _repository = new();
     private readonly ProductCategoryRepository _categoryRepository = new();
-    private readonly ProductOptionRepository _optionRepository = new();
 
     /// <summary>
     /// Returns all products, available or not, ordered by category name and
@@ -104,18 +103,10 @@ public class ProductService
             throw new BusinessException("El producto no existe.");
         }
 
-        List<int> ids = productOptionIds.Distinct().ToList();
-
-        HashSet<int> existingIds = _optionRepository.GetAll()
-            .Select(option => option.ProductOptionId)
-            .ToHashSet();
-
-        if (ids.Any(id => !existingIds.Contains(id)))
+        if (!_repository.ReplaceAllowedOptions(productId, productOptionIds))
         {
             throw new BusinessException("Alguna de las opciones seleccionadas no existe.");
         }
-
-        _repository.ReplaceAllowedOptions(productId, ids);
     }
 
     /// <summary>

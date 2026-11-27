@@ -162,36 +162,44 @@ public class ProductRepository
 
     /// <summary>
     /// Replaces the options allowed for the product, in one transaction.
-    /// Repeated ids are ignored. An id that does not exist raises a
-    /// MySqlException and leaves the previous assignments untouched; Business
-    /// validates the ids before calling.
+    /// Repeated ids are ignored. Returns false, without changes, when an id
+    /// does not exist (the foreign key is the guard).
     /// </summary>
-    public void ReplaceAllowedOptions(int productId, IEnumerable<int> productOptionIds)
+    public bool ReplaceAllowedOptions(int productId, IEnumerable<int> productOptionIds)
     {
         using MySqlConnection cn = Connection.Create();
         cn.Open();
         using MySqlTransaction tx = cn.BeginTransaction();
 
-        using (MySqlCommand delete = new(
-            "DELETE FROM product_allowed_option WHERE product_id = @product_id;", cn, tx))
+        try
         {
-            delete.Parameters.AddWithValue("@product_id", productId);
-            delete.ExecuteNonQuery();
+            using (MySqlCommand delete = new(
+                "DELETE FROM product_allowed_option WHERE product_id = @product_id;", cn, tx))
+            {
+                delete.Parameters.AddWithValue("@product_id", productId);
+                delete.ExecuteNonQuery();
+            }
+
+            using MySqlCommand insert = new(
+                "INSERT INTO product_allowed_option (product_id, product_option_id) " +
+                "VALUES (@product_id, @product_option_id);", cn, tx);
+            insert.Parameters.AddWithValue("@product_id", productId);
+            MySqlParameter optionParameter = insert.Parameters.AddWithValue("@product_option_id", 0);
+
+            foreach (int productOptionId in productOptionIds.Distinct())
+            {
+                optionParameter.Value = productOptionId;
+                insert.ExecuteNonQuery();
+            }
+
+            tx.Commit();
+            return true;
         }
-
-        using MySqlCommand insert = new(
-            "INSERT INTO product_allowed_option (product_id, product_option_id) " +
-            "VALUES (@product_id, @product_option_id);", cn, tx);
-        insert.Parameters.AddWithValue("@product_id", productId);
-        MySqlParameter optionParameter = insert.Parameters.AddWithValue("@product_option_id", 0);
-
-        foreach (int productOptionId in productOptionIds.Distinct())
+        catch (MySqlException ex) when (MySqlErrors.IsReferenceMissing(ex))
         {
-            optionParameter.Value = productOptionId;
-            insert.ExecuteNonQuery();
+            tx.Rollback();
+            return false;
         }
-
-        tx.Commit();
     }
 
     // The reader is closed when this method returns, so the caller can run

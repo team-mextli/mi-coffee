@@ -15,6 +15,17 @@ internal static class MySqlErrors
     }
 
     /// <summary>
+    /// True when an INSERT or UPDATE was rejected because the row it
+    /// references does not exist. The server reports 1452; it reports 1216
+    /// instead when the account lacks table privileges on the referenced
+    /// table.
+    /// </summary>
+    public static bool IsReferenceMissing(MySqlException ex)
+    {
+        return ex.Number is 1452 or 1216;
+    }
+
+    /// <summary>
     /// True when a trigger or a stored procedure rejected the statement with
     /// SIGNAL. Without an explicit MYSQL_ERRNO, SIGNAL SQLSTATE '45000' is
     /// reported as 1644 (confirmed on MySQL 8.0 with the triggers and
