@@ -27,7 +27,7 @@ builder.Services
 	.AddCookie(options =>
 	{
 		options.LoginPath = "/Staff/Login";
-		options.AccessDeniedPath = "/Staff/Login";
+		options.AccessDeniedPath = "/Staff/AccessDenied";
 		options.ExpireTimeSpan = TimeSpan.FromHours(8);
 		options.SlidingExpiration = false;
 	});
