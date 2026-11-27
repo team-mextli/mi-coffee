@@ -178,7 +178,7 @@ public class UserRepository
             FullName = reader.GetString(1),
             Username = reader.GetString(2),
             PasswordHash = reader.GetString(3),
-            Role = Enum.Parse<UserRole>(reader.GetString(4)),
+            Role = reader.GetEnum<UserRole>(4),
             IsActive = reader.GetBoolean(5)
         };
     }
