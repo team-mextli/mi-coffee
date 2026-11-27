@@ -158,7 +158,7 @@ public class OrderRepository
         cmd.Parameters.AddWithValue("@customer_order_id", orderId);
 
         using MySqlDataReader reader = cmd.ExecuteReader();
-        return reader.Read() ? Enum.Parse<OrderStatus>(reader.GetString(0)) : null;
+        return reader.Read() ? reader.GetEnum<OrderStatus>(0) : null;
     }
 
     /// <summary>
@@ -326,8 +326,8 @@ public class OrderRepository
                 OrderStatusHistoryId = reader.GetInt32(0),
                 CustomerOrderId = order.CustomerOrderId,
                 UserId = reader.GetInt32(1),
-                PreviousStatus = Enum.Parse<OrderStatus>(reader.GetString(2)),
-                NewStatus = Enum.Parse<OrderStatus>(reader.GetString(3)),
+                PreviousStatus = reader.GetEnum<OrderStatus>(2),
+                NewStatus = reader.GetEnum<OrderStatus>(3),
                 ChangedAt = reader.GetDateTime(4),
                 ChangedByName = reader.GetString(5)
             });
@@ -342,7 +342,7 @@ public class OrderRepository
             CreatedAt = reader.GetDateTime(1),
             CustomerName = reader.IsDBNull(2) ? null : reader.GetString(2),
             Total = reader.GetDecimal(3),
-            Status = Enum.Parse<OrderStatus>(reader.GetString(4))
+            Status = reader.GetEnum<OrderStatus>(4)
         };
     }
 }
