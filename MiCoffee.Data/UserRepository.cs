@@ -128,6 +128,25 @@ public class UserRepository
         return true;
     }
 
+    /// <summary>
+    /// Replaces the password hash after a successful login. Does nothing when
+    /// the stored hash is no longer currentHash, so a password changed in the
+    /// meantime is kept.
+    /// </summary>
+    public void UpdatePasswordHash(int userId, string currentHash, string newHash)
+    {
+        using MySqlConnection cn = Connection.Create();
+        cn.Open();
+
+        using MySqlCommand cmd = new(
+            "UPDATE `user` SET password_hash = @new_hash " +
+            "WHERE user_id = @user_id AND password_hash = @current_hash;", cn);
+        cmd.Parameters.AddWithValue("@new_hash", newHash);
+        cmd.Parameters.AddWithValue("@user_id", userId);
+        cmd.Parameters.AddWithValue("@current_hash", currentHash);
+        cmd.ExecuteNonQuery();
+    }
+
     // Locks the active Admin rows until the transaction ends, so two concurrent
     // changes cannot both see another Admin remaining.
     private static bool IsLastActiveAdmin(MySqlConnection cn, MySqlTransaction tx, int userId)
