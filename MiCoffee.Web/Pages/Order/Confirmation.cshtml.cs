@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MiCoffee.Web.Pages.Order;
@@ -8,8 +9,14 @@ public class ConfirmationModel : PageModel
     // customer interface never exposes the data of other orders.
     public int OrderId { get; private set; }
 
-    public void OnGet(int id)
+    public IActionResult OnGet()
     {
+        if (!int.TryParse(TempData["OrderId"] as string, out int id))
+        {
+            return RedirectToPage("/Index");
+        }
+
         OrderId = id;
+        return Page();
     }
 }
